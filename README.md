@@ -1,1 +1,2 @@
 # PaletAI
+: first commit
