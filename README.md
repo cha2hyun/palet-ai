@@ -56,12 +56,17 @@ Comes with an eye-friendly dark theme.
 Visit the [Releases page](https://github.com/cha2hyun/PaletAI/releases) to download the latest version:
 
 - **macOS (Apple Silicon)**: Download `PaletAI-macOS-arm64.zip`
-  - Unzip and drag `Palet AI.app` to your Applications folder
-  - ⚠️ **First Launch**: If you see "app is damaged" error, run this in Terminal:
-    ```bash
-    xattr -cr "/Applications/Palet AI.app"
-    ```
-    Or right-click the app → Open → Click "Open" button
+
+  1. Unzip the downloaded file
+  2. **IMPORTANT - Run this command first** (before opening the app):
+     ```bash
+     xattr -cr ~/Downloads/Palet\ AI.app
+     ```
+  3. Drag `Palet AI.app` to your Applications folder
+  4. Double-click to open
+
+  > 💡 **Why?** macOS marks downloaded apps as "quarantined". This command removes that flag.
+
 - **Windows**: Download `PaletAI-Win32.exe` (32-bit) or `PaletAI-Win64.exe` (64-bit)
   - ⚠️ **Note**: Windows builds are not fully tested yet. Please report any issues you encounter.
 

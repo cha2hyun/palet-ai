@@ -90,7 +90,7 @@ jobs:
       - name: Zip Mac App
         run: |
           cd dist/mac-arm64
-          ditto -c -k --sequesterRsrc --keepParent "Palet AI.app" ../../PaletAI-macOS-arm64.zip
+          zip -r -y ../../PaletAI-macOS-arm64.zip "Palet AI.app"
           cd ../..
 
       - name: Upload Mac ARM64 App
