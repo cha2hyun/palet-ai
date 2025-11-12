@@ -13,7 +13,8 @@
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
   ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
-  ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
+  ![Version](https://img.shields.io/badge/version-1.0.1-green.svg)
+  [![Homebrew](https://img.shields.io/badge/homebrew-available-orange.svg)](https://github.com/cha2hyun/homebrew-tap)
   
 </div>
 
@@ -50,6 +51,28 @@ Comes with an eye-friendly dark theme.
 ---
 
 ## 📥 Download & Installation
+
+### 🍺 Homebrew (Recommended for macOS)
+
+The easiest way to install on macOS:
+
+```bash
+# Install via Homebrew
+brew install --cask cha2hyun/tap/palet-ai
+
+# Update to latest version
+brew upgrade palet-ai
+
+# Uninstall
+brew uninstall --cask palet-ai
+```
+
+**Why Homebrew?**
+
+- ✅ One-command installation
+- ✅ Automatic quarantine removal (no `xattr` needed!)
+- ✅ Easy updates with `brew upgrade`
+- ✅ Trusted by millions of developers
 
 ### Download Pre-built Releases
 
