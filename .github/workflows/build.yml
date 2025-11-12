@@ -6,25 +6,17 @@ on:
       - deploy
 
 jobs:
-  build-mac:
-    runs-on: macos-latest
+  create-release:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.version.outputs.VERSION }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Mac ARM64
-        run: npm run dist:mac:arm64
 
       - name: Get version
         id: version
@@ -42,33 +34,101 @@ jobs:
             ## Palet AI v${{ steps.version.outputs.VERSION }}
 
             ### Features
-            - ChatGPT, Gemini, Perplexity, Claude AI support
-            - Multiple AI services in one app
-            - Dark and minimalist UI
-            - Maximum 4 services selection
-            - App-only zoom shortcuts (Cmd +/-)
+            - 🎯 ChatGPT, Gemini, Perplexity, Claude AI support
+            - 🔑 **No API key needed** - Just login and use
+            - 🚀 Multiple AI services in one app
+            - 🎨 Dark and minimalist UI
+            - 📱 Maximum 4 services selection
+            - ⌨️ App-only zoom shortcuts (Cmd +/-)
 
             ### Downloads
-            - macOS (ARM64): `Palet AI-${{ steps.version.outputs.VERSION }}-arm64.dmg`
+            - **macOS (ARM64)**: `PaletAI-macOS-arm64.zip` - Apple Silicon (M1/M2/M3)
+            - **Windows (x86)**: `PaletAI-Win32.exe` - 32-bit (⚠️ Not fully tested)
+            - **Windows (x64)**: `PaletAI-Win64.exe` - 64-bit (⚠️ Not fully tested)
+
+            ### Installation Notes
+            - **macOS**: Unzip and drag `Palet AI.app` to Applications folder
+            - **Windows**: Run the portable executable directly (⚠️ Windows builds are not fully tested yet)
           draft: false
           prerelease: false
 
-      - name: Upload Mac ARM64 DMG
+  build-mac:
+    needs: create-release
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build Mac ARM64
+        run: yarn dist:mac:arm64
+
+      - name: Zip Mac App
+        run: |
+          cd dist/mac-arm64
+          zip -r -y ../../PaletAI-macOS-arm64.zip "Palet AI.app"
+          cd ../..
+
+      - name: Upload Mac ARM64 App
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/Palet AI-${{ steps.version.outputs.VERSION }}-arm64.dmg
-          asset_name: Palet AI-${{ steps.version.outputs.VERSION }}-arm64.dmg
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./PaletAI-macOS-arm64.zip
+          asset_name: PaletAI-macOS-arm64.zip
+          asset_content_type: application/zip
+
+  build-windows:
+    needs: create-release
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build Windows x86 (32-bit)
+        run: yarn dist:win
+
+      - name: Build Windows x64 (64-bit)
+        run: yarn dist:win:x64
+
+      - name: Upload Windows x86
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./dist/Palet AI.exe
+          asset_name: PaletAI-Win32.exe
           asset_content_type: application/octet-stream
 
-      - name: Upload Mac ARM64 DMG Blockmap
+      - name: Upload Windows x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/Palet AI-${{ steps.version.outputs.VERSION }}-arm64.dmg.blockmap
-          asset_name: Palet AI-${{ steps.version.outputs.VERSION }}-arm64.dmg.blockmap
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./dist/Palet AI.exe
+          asset_name: PaletAI-Win64.exe
           asset_content_type: application/octet-stream

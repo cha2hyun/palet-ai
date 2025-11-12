@@ -19,23 +19,26 @@
     "typescript"
   ],
   "repository": {
-    "url": "https://github.krafton.com/sh-chae/multi-ai-electron"
+    "type": "git",
+    "url": "https://github.com/cha2hyun/PaletAI.git"
   },
+  "homepage": "https://github.com/cha2hyun/PaletAI",
   "productName": "Palet AI",
   "scripts": {
     "dev": "vite",
-    "dev:electron": "npm run build:electron && electron .",
-    "build": "npm run build:vite && npm run build:electron",
+    "dev:electron": "yarn build:electron && electron .",
+    "build": "yarn build:vite && yarn build:electron",
     "build:vite": "vite build",
     "build:electron": "tsc -p electron",
-    "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac",
-    "dist:mac:arm64": "npm run build && electron-builder --mac --arm64",
-    "dist:mac:x64": "npm run build && electron-builder --mac --x64",
-    "dist:mac:universal": "npm run build && electron-builder --mac --universal",
-    "dist:linux": "npm run build && electron-builder --linux",
-    "pack": "npm run build && electron-builder --dir",
+    "dist": "yarn build && electron-builder",
+    "dist:win": "yarn build && electron-builder --win --ia32",
+    "dist:win:x64": "yarn build && electron-builder --win --x64",
+    "dist:mac": "yarn build && electron-builder --mac --dir",
+    "dist:mac:arm64": "yarn build && electron-builder --mac --arm64 --dir",
+    "dist:mac:x64": "yarn build && electron-builder --mac --x64 --dir",
+    "dist:mac:universal": "yarn build && electron-builder --mac --universal --dir",
+    "dist:linux": "yarn build && electron-builder --linux",
+    "pack": "yarn build && electron-builder --dir",
     "clean": "rimraf dist main src/out",
     "type-check": "tsc",
     "lint": "eslint . --ext js,jsx,ts,tsx",
@@ -100,7 +103,7 @@
       "category": "public.app-category.productivity",
       "target": [
         {
-          "target": "dmg",
+          "target": "dir",
           "arch": [
             "arm64"
           ]
@@ -117,6 +120,7 @@
         {
           "target": "portable",
           "arch": [
+            "ia32",
             "x64"
           ]
         }
@@ -128,21 +132,6 @@
         "AppImage",
         "deb"
       ]
-    },
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220
-        },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ],
-      "title": "Palet AI"
     }
   }
 }

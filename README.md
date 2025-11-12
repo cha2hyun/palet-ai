@@ -5,7 +5,7 @@
   
   **The easiest way to use multiple AI services simultaneously in one screen**
   
-  Run and compare ChatGPT, Google Gemini, Claude, and Perplexity side by side.
+  Run and compare ChatGPT, Google Gemini, Claude, and Perplexity side by side. NO API KEY NEEDED
   
   <img src="Screenshot.jpg" alt="Palet AI Screenshot" width="800" />
   
@@ -18,6 +18,10 @@
 ---
 
 ## ✨ Key Features
+
+### 🔑 No API Key Needed
+
+Just log in to each AI service and start using immediately. No complex API setup required!
 
 ### 🎯 Ask Multiple AIs at Once
 
@@ -45,32 +49,49 @@ Comes with an eye-friendly dark theme.
 
 ## 📥 Download & Installation
 
-### macOS (Apple Silicon)
+### Download Pre-built Releases
+
+Visit the [Releases page](https://github.com/cha2hyun/PaletAI/releases) to download the latest version:
+
+- **macOS (Apple Silicon)**: Download `PaletAI-macOS-arm64.zip`
+  - Unzip and drag `Palet AI.app` to your Applications folder
+- **Windows**: Download `PaletAI-Win32.exe` (32-bit) or `PaletAI-Win64.exe` (64-bit)
+  - ⚠️ **Note**: Windows builds are not fully tested yet. Please report any issues you encounter.
+
+### Build from Source
+
+#### macOS (Apple Silicon)
 
 ```bash
 # Clone the repository
-git clone https://github.krafton.com/sh-chae/multi-ai-electron.git
-cd multi-ai-electron
+git clone https://github.com/cha2hyun/PaletAI.git
+cd PaletAI
 
 # Install dependencies
-npm install
+yarn install
 
 # Build the app
-npm run dist:mac:arm64
+yarn dist:mac:arm64
 ```
 
-The built app can be found in the `dist/` folder.
+The built app can be found in the `dist/mac-arm64/` folder.
 
-### Windows
+#### Windows
 
 ```bash
-npm run dist:win
+# For 32-bit
+yarn dist:win
+
+# For 64-bit
+yarn dist:win:x64
 ```
 
-### Linux
+⚠️ **Windows Support**: Windows builds are not fully tested. If you encounter issues, please open an issue on GitHub.
+
+#### Linux
 
 ```bash
-npm run dist:linux
+yarn dist:linux
 ```
 
 ---
@@ -122,19 +143,19 @@ Compare code suggestions from multiple AIs and choose the optimal solution.
 ### Requirements
 
 - Node.js 16 or higher
-- npm or yarn
+- yarn (recommended) or npm
 
 ### Running in Development Mode
 
 ```bash
 # Install dependencies
-npm install
+yarn install
 
 # Start development server
-npm run dev
+yarn dev
 
 # Run Electron in a separate terminal
-npm run dev:electron
+yarn dev:electron
 ```
 
 ---
@@ -158,14 +179,15 @@ MIT License - Free to use, modify, and distribute.
 
 ## 👤 Author
 
-**[@cha2hyun](https://github.krafton.com/sh-chae)**
+**[@cha2hyun](https://github.com/cha2hyun)**
 
 ---
 
 ## 🔗 Links
 
-- [GitHub Repository](https://github.krafton.com/sh-chae/multi-ai-electron/)
-- [Issue Reports](https://github.krafton.com/sh-chae/multi-ai-electron/issues)
+- [GitHub Repository](https://github.com/cha2hyun/PaletAI)
+- [Issue Reports](https://github.com/cha2hyun/PaletAI/issues)
+- [Latest Releases](https://github.com/cha2hyun/PaletAI/releases)
 
 ---
 
