@@ -1,6 +1,6 @@
 {
   "name": "palet-ai",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "main": "dist-electron/index.js",
   "author": {
@@ -20,9 +20,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/cha2hyun/PaletAI.git"
+    "url": "https://github.com/cha2hyun/palet-ai.git"
   },
-  "homepage": "https://github.com/cha2hyun/PaletAI",
+  "homepage": "https://github.com/cha2hyun/palet-ai",
   "productName": "Palet AI",
   "scripts": {
     "dev": "vite",

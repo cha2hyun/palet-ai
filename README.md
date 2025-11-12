@@ -13,65 +13,76 @@
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
   ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
-  ![Version](https://img.shields.io/badge/version-1.0.1-green.svg)
+  ![Version](https://img.shields.io/badge/version-1.0.2-green.svg)
   [![Homebrew](https://img.shields.io/badge/homebrew-available-orange.svg)](https://github.com/cha2hyun/homebrew-tap)
   
 </div>
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🔑 No API Key Needed
+### No API Key Needed
 
 Just log in to each AI service and start using immediately. No complex API setup required!
 
-### 🎯 Ask Multiple AIs at Once
+### Ask Multiple AIs at Once
 
 Send questions to multiple AI services from a single input field. Compare responses from ChatGPT, Gemini, Claude, and Perplexity at a glance.
 
-### 🎨 Flexible Layouts
+### Flexible Layouts
 
 - **Column Layout**: Stack AIs vertically
 - **Row Layout**: Arrange AIs horizontally
-- **2×2 Grid**: Display 4 screens in a grid
+- **2x2 Grid**: Display 4 screens in a grid
 
-### 🔍 Integrated Browser
+### Integrated Browser
 
 Web search is also available. Compare AI responses with actual search results simultaneously.
 
-### 💾 Automatic Login Persistence
+### Automatic Login Persistence
 
 Once you log in, your session is automatically saved. You can start using it immediately on the next launch.
 
-### 🎭 Dark Mode
+### Dark Mode
 
 Comes with an eye-friendly dark theme.
 
 ---
 
-## 📥 Download & Installation
+## Download & Installation
 
-### 🍺 Homebrew (⭐ RECOMMENDED)
+### Homebrew (RECOMMENDED)
 
 **The easiest and best way to install on macOS:**
 
+⚠️ **Note**: macOS ARM64 (Apple Silicon M1/M2/M3) only. Intel Macs are not supported.
+
 ```bash
+# One-line install (recommended)
 brew install --cask cha2hyun/tap/palet-ai
 ```
 
-That's it! The app is ready to use. 🎉
+Or if you prefer shorter commands:
+
+```bash
+# Add tap first, then use short name
+brew tap cha2hyun/tap
+brew install --cask palet-ai
+```
+
+That's it! The app is ready to use.
 
 **Why Homebrew is recommended:**
 
-- ✅ **One-command installation** - Simple and fast
-- ✅ **No code signing issues** - Automatic quarantine removal
-- ✅ **Easy updates** - Just run `brew upgrade palet-ai`
-- ✅ **Trusted platform** - Used by millions of developers worldwide
-- ✅ **No manual steps** - Works immediately after installation
+- **One-command installation** - Simple and fast
+- **No code signing issues** - Automatic quarantine removal
+- **Easy updates** - Just run `brew upgrade palet-ai`
+- **Trusted platform** - Used by millions of developers worldwide
+- **No manual steps** - Works immediately after installation
 
 <details>
-<summary>📖 More Homebrew commands</summary>
+<summary>More Homebrew commands</summary>
 
 ```bash
 # Update to latest version
@@ -82,13 +93,16 @@ brew uninstall --cask palet-ai
 
 # Check app info
 brew info palet-ai
+
+# List all installed casks
+brew list --cask
 ```
 
 </details>
 
 ---
 
-### 📦 Direct Download from GitHub Releases
+### Direct Download from GitHub Releases
 
 ⚠️ **NOT RECOMMENDED** - Manual steps required due to lack of code signing
 
@@ -106,14 +120,16 @@ This app is **not signed with an Apple Developer ID** (costs $99/year). When you
 
 </details>
 
-If you still want to download directly, visit the [Releases page](https://github.com/cha2hyun/PaletAI/releases):
+If you still want to download directly, visit the [Releases page](https://github.com/cha2hyun/palet-ai/releases):
 
-#### **macOS (Apple Silicon)**
+#### macOS (Apple Silicon Only)
 
-Download `PaletAI-macOS-arm64.zip`
+Download `palet-ai-macOS-arm64.zip`
+
+⚠️ **Note**: Only ARM64 (Apple Silicon M1/M2/M3) is supported. Intel Macs are not supported.
 
 1. Unzip the downloaded file
-2. **⚠️ REQUIRED - Run this command in Terminal:**
+2. ⚠️ **REQUIRED - Run this command in Terminal:**
    ```bash
    xattr -cr ~/Downloads/Palet\ AI.app
    ```
@@ -122,20 +138,26 @@ Download `PaletAI-macOS-arm64.zip`
 
 > **Why is this needed?** Without Apple Developer code signing, macOS marks downloaded apps as "quarantined". The `xattr` command removes this flag. **Homebrew does this automatically.**
 
-#### **Windows**
+#### Windows
 
-Download `PaletAI-Win32.exe` (32-bit) or `PaletAI-Win64.exe` (64-bit)
+Download `palet-ai-Win32.exe` (32-bit) or `palet-ai-Win64.exe` (64-bit)
 
 ⚠️ **Note**: Windows builds are not fully tested yet. Please report any issues you encounter.
 
+#### Linux
+
+⚠️ **Note**: Linux builds are not fully tested yet. Please report any issues you encounter.
+
 ### Build from Source
 
-#### macOS (Apple Silicon)
+#### macOS (Apple Silicon Only)
+
+⚠️ **Note**: Only ARM64 (Apple Silicon M1/M2/M3) is supported. Intel Macs are not supported.
 
 ```bash
 # Clone the repository
-git clone https://github.com/cha2hyun/PaletAI.git
-cd PaletAI
+git clone https://github.com/cha2hyun/palet-ai.git
+cd palet-ai
 
 # Install dependencies
 yarn install
@@ -156,7 +178,7 @@ yarn dist:win
 yarn dist:win:x64
 ```
 
-⚠️ **Windows Support**: Windows builds are not fully tested. If you encounter issues, please open an issue on GitHub.
+⚠️ **Note**: Windows builds are not fully tested yet. Please report any issues you encounter.
 
 #### Linux
 
@@ -164,51 +186,53 @@ yarn dist:win:x64
 yarn dist:linux
 ```
 
+⚠️ **Note**: Linux builds are not fully tested yet. Please report any issues you encounter.
+
 ---
 
-## 🚀 How to Use
+## How to Use
 
-### 1️⃣ Getting Started
+### Getting Started
 
 When you launch the app, you'll see the login screens for each AI service. Log in to the services you want to use.
 
-### 2️⃣ Asking Questions
+### Asking Questions
 
 - Enter your question in the input field at the bottom
 - **Enter**: Send question
 - **Shift + Enter**: New line
 
-### 3️⃣ Service Selection
+### Service Selection
 
 If you want to use only specific AIs, you can select/deselect them using the checkboxes at the bottom.
 
-### 4️⃣ Changing Layout
+### Changing Layout
 
 Freely adjust the screen arrangement with the Column/Row/Grid buttons.
 
 ---
 
-## 💡 Use Cases
+## Use Cases
 
-### 📚 Learning & Research
+### Learning & Research
 
 Get more accurate information by comparing responses from multiple AIs.
 
-### ✍️ Writing
+### Writing
 
 Receive ideas from various perspectives at once.
 
-### 🔍 Information Search
+### Information Search
 
 Fact-check by viewing AI responses and actual web search results simultaneously.
 
-### 💻 Coding
+### Coding
 
 Compare code suggestions from multiple AIs and choose the optimal solution.
 
 ---
 
-## ⚙️ Development Environment
+## Development Environment
 
 ### Requirements
 
@@ -230,7 +254,7 @@ yarn dev:electron
 
 ---
 
-## 🎨 Tech Stack
+## Tech Stack
 
 - **Electron 30** - Cross-platform desktop app framework
 - **React 18** - UI framework
@@ -241,30 +265,31 @@ yarn dev:electron
 
 ---
 
-## 📝 License
+## License
 
 MIT License - Free to use, modify, and distribute.
 
 ---
 
-## 👤 Author
+## Author
 
 **[@cha2hyun](https://github.com/cha2hyun)**
 
 ---
 
-## 🔗 Links
+## Links
 
-- [GitHub Repository](https://github.com/cha2hyun/PaletAI)
-- [Issue Reports](https://github.com/cha2hyun/PaletAI/issues)
-- [Latest Releases](https://github.com/cha2hyun/PaletAI/releases)
+- [GitHub Repository](https://github.com/cha2hyun/palet-ai)
+- [Homebrew Tap](https://github.com/cha2hyun/homebrew-tap)
+- [Issue Reports](https://github.com/cha2hyun/palet-ai/issues)
+- [Latest Releases](https://github.com/cha2hyun/palet-ai/releases)
 
 ---
 
 <div align="center">
   
-  **Use AI smarter with Palet AI! 🎨✨**
+  **Use AI smarter with Palet AI!**
   
-  Made with ❤️ by @cha2hyun
+  Made by @cha2hyun
   
 </div>

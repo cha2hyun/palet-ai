@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import packageJson from '../package.json';
 
 function AppBar() {
   const [isMaximize, setMaximize] = useState(false);
@@ -57,7 +58,7 @@ function AppBar() {
           </button>
         </div>
 
-        <p className="text-sm text-gray-400">Palet AI</p>
+        <p className="text-sm text-gray-400">palet-ai (v{packageJson.version})</p>
       </div>
     </div>
   );
