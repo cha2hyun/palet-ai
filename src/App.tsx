@@ -193,7 +193,7 @@ function App() {
 
             {/* GitHub 바로가기 */}
             <a
-              href="https://github.krafton.com/sh-chae/multi-ai-electron/"
+              href="https://github.com/cha2hyun/PaletAI"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 h-10 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800 hover:border-gray-700 transition-colors"
