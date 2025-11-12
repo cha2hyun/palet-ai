@@ -45,10 +45,19 @@ jobs:
             - **macOS (ARM64)**: `PaletAI-macOS-arm64.zip` - Apple Silicon (M1/M2/M3)
             - **Windows (x86)**: `PaletAI-Win32.exe` - 32-bit (⚠️ Not fully tested)
             - **Windows (x64)**: `PaletAI-Win64.exe` - 64-bit (⚠️ Not fully tested)
-
+            
             ### Installation Notes
-            - **macOS**: Unzip and drag `Palet AI.app` to Applications folder
-            - **Windows**: Run the portable executable directly (⚠️ Windows builds are not fully tested yet)
+            
+            **macOS:**
+            1. Unzip and drag `Palet AI.app` to Applications folder
+            2. If you see "app is damaged" error, run in Terminal:
+               ```
+               xattr -cr "/Applications/Palet AI.app"
+               ```
+               Or right-click → Open → Click "Open"
+            
+            **Windows:**
+            - Run the portable executable directly (⚠️ Not fully tested yet)
           draft: false
           prerelease: false
 
@@ -73,10 +82,15 @@ jobs:
       - name: Build Mac ARM64
         run: yarn dist:mac:arm64
 
+      - name: Fix Permissions
+        run: |
+          chmod -R +x "dist/mac-arm64/Palet AI.app/Contents/MacOS"
+          xattr -cr "dist/mac-arm64/Palet AI.app"
+
       - name: Zip Mac App
         run: |
           cd dist/mac-arm64
-          zip -r -y ../../PaletAI-macOS-arm64.zip "Palet AI.app"
+          ditto -c -k --sequesterRsrc --keepParent "Palet AI.app" ../../PaletAI-macOS-arm64.zip
           cd ../..
 
       - name: Upload Mac ARM64 App
