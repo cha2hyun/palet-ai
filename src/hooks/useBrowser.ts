@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { WebviewElement } from './useWebviewManager';
 import { DEFAULT_BROWSER_URL } from '../constants/aiServices';
 
-export function useBrowser(browserRef: React.RefObject<WebviewElement>) {
+export default function useBrowser(browserRef: React.RefObject<WebviewElement>) {
   const [browserUrl, setBrowserUrl] = useState(() => {
     try {
       const savedBrowserUrl = localStorage.getItem('browserUrl');

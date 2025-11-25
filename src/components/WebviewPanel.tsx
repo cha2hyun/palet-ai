@@ -12,13 +12,17 @@ interface WebviewPanelProps {
 export default function WebviewPanel({ service, webviewRef, isVisible, lastUrl, onUrlChange }: WebviewPanelProps) {
   // useRef로 초기 URL을 고정 - 컴포넌트가 리렌더링되어도 절대 변경되지 않음
   const initialUrlRef = useRef(lastUrl || service.url);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const webview = webviewRef.current as any;
-    if (!webview) return;
+    if (!webview) {
+      return undefined;
+    }
 
     // URL 변경 감지 (디바운스 적용) - localStorage에만 저장
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleNavigate = (event: any) => {
       const newUrl = event.url;
       if (!newUrl || !onUrlChange) return;
@@ -41,7 +45,7 @@ export default function WebviewPanel({ service, webviewRef, isVisible, lastUrl, 
     return () => {
       webview.removeEventListener('did-navigate', handleNavigate);
       webview.removeEventListener('did-navigate-in-page', handleNavigate);
-      
+
       // 클린업 시 타이머도 정리
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);

@@ -1,6 +1,9 @@
 import { useCallback } from 'react';
 import { WebviewElement } from './useWebviewManager';
 
+// 개발 모드 체크
+const isDev = import.meta.env.DEV;
+
 export function useAIServices() {
   const sendToAI = useCallback(
     async (
@@ -14,24 +17,20 @@ export function useAIServices() {
         return;
       }
 
-      // webview DOM이 로드될 때까지 잠시 대기
-      await new Promise<void>((resolve) => {
-        setTimeout(() => resolve(), 300);
-      });
-
       try {
         const code = `
         (function() {
           try {
-            console.log('\\n=== ${serviceName} Send Debug ===');
-            console.log('🔍 Searching for textarea with selector: ${selector}');
+            ${isDev ? `console.log('\\n=== ${serviceName} Send Debug ===');` : ''}
+            ${isDev ? `console.log('🔍 Searching for textarea with selector: ${selector}');` : ''}
             
             // 입력창 찾기
             const inputElement = document.querySelector('${selector}');
             if (!inputElement) {
+              ${
+                isDev
+                  ? `
               console.error('❌ Input element NOT found with selector: ${selector}');
-              
-              // 모든 textarea와 contenteditable 출력
               const allTextareas = document.querySelectorAll('textarea');
               const allContentEditables = document.querySelectorAll('[contenteditable="true"]');
               console.log('📝 Found ' + allTextareas.length + ' textarea(s)');
@@ -43,36 +42,42 @@ export function useAIServices() {
                   className: el.className
                 });
               });
+              `
+                  : ''
+              }
               return false;
             }
             
+            ${
+              isDev
+                ? `
             console.log('✅ Input element found!');
             console.log('📝 Element info:', {
               id: inputElement.id,
               tagName: inputElement.tagName,
               contentEditable: inputElement.contentEditable
             });
+            `
+                : ''
+            }
             
             // contenteditable div인지 textarea인지 확인
             const isContentEditable = inputElement.contentEditable === 'true';
             
             if (isContentEditable) {
-              console.log('✏️  Detected ContentEditable div');
+              ${isDev ? `console.log('✏️  Detected ContentEditable div');` : ''}
               
               // Lexical editor 체크 (Perplexity 등)
               const isLexicalEditor = inputElement.closest('[data-lexical-editor]') !== null;
               
               if (isLexicalEditor) {
-                console.log('📝 Lexical editor detected (Perplexity)');
+                ${isDev ? `console.log('📝 Lexical editor detected (Perplexity)');` : ''}
                 
                 // Focus 먼저
                 inputElement.focus();
-                console.log('🎯 Focused on input');
                 
-                // 방법 1: innerHTML로 p 태그 설정 (Lexical은 p 태그 사용)
-                console.log('⌨️  Setting innerHTML with p tag...');
+                // innerHTML로 p 태그 설정 (Lexical은 p 태그 사용)
                 inputElement.innerHTML = '<p>' + ${JSON.stringify(message)} + '</p>';
-                console.log('📄 innerHTML set');
                 
                 // InputEvent 트리거 (type: 'insertText')
                 const inputEvent = new InputEvent('input', {
@@ -82,31 +87,24 @@ export function useAIServices() {
                   data: ${JSON.stringify(message)}
                 });
                 inputElement.dispatchEvent(inputEvent);
-                console.log('🎯 InputEvent dispatched');
                 
                 // 추가 이벤트들
                 inputElement.dispatchEvent(new Event('change', { bubbles: true }));
                 inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
-                console.log('✅ Additional events dispatched');
               } else {
                 // 일반 ContentEditable div (ChatGPT, Gemini)
-                console.log('⌨️  Setting textContent...');
                 inputElement.textContent = ${JSON.stringify(message)};
-                console.log('📄 TextContent set:', inputElement.textContent);
                 
                 // focus
                 inputElement.focus();
                 
                 // input 이벤트 트리거
-                console.log('🎯 Dispatching input event...');
                 inputElement.dispatchEvent(new Event('input', { bubbles: true }));
                 inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-                console.log('✅ Events dispatched');
               }
             } else {
               // Textarea 또는 Input 요소
               const tagName = inputElement.tagName.toLowerCase();
-              console.log('📝 Detected ' + tagName + ' element');
               
               // 값 설정
               inputElement.value = ${JSON.stringify(message)};
@@ -125,24 +123,16 @@ export function useAIServices() {
               inputElement.focus();
               inputElement.dispatchEvent(new Event('input', { bubbles: true }));
               inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-              console.log('✅ Value set and events dispatched');
             }
             
             // 전송 버튼 찾기 및 클릭 (또는 Enter 키 시뮬레이션)
-            console.log('⏳ Waiting 100ms before submitting...');
             setTimeout(() => {
-              console.log('🔍 Searching for button with selector: ${buttonSelector}');
               const button = document.querySelector('${buttonSelector}');
               if (button) {
-                console.log('✅ Button found!');
-                console.log('🖱️  Clicking button...');
                 button.click();
-                console.log('🚀 Button clicked successfully!');
+                ${isDev ? `console.log('🚀 Button clicked successfully!');` : ''}
               } else {
-                console.log('⚠️  Send button NOT found, trying Enter key instead...');
-                
                 // Enter 키 시뮬레이션 (Perplexity 등에서 사용)
-                console.log('⌨️  Simulating Enter key press...');
                 const enterEvent = new KeyboardEvent('keydown', {
                   key: 'Enter',
                   code: 'Enter',
@@ -152,13 +142,12 @@ export function useAIServices() {
                   cancelable: true
                 });
                 inputElement.dispatchEvent(enterEvent);
-                console.log('✅ Enter key dispatched!');
               }
             }, 100);
             
             return true;
           } catch (error) {
-            console.error('❌ Error in sendToAI:', error);
+            ${isDev ? `console.error('❌ Error in sendToAI:', error);` : ''}
             return false;
           }
         })();

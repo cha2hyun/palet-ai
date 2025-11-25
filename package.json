@@ -1,6 +1,6 @@
 {
   "name": "palet-ai",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "license": "MIT",
   "main": "dist-electron/index.js",
   "author": {
@@ -48,14 +48,14 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.5",
-    "@vitejs/plugin-react": "^1.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
     "electron-is-dev": "^2.0.0",
     "framer-motion": "^12.23.24",
     "i18next": "^23.11.5",
     "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^14.1.2",
-    "vite": "^2.8.6",
+    "vite": "^5.4.11",
     "vite-plugin-electron": "^0.28.7",
     "vite-plugin-electron-renderer": "^0.14.5"
   },
@@ -78,7 +78,7 @@
     "postcss": "^8.4.12",
     "prettier": "2.6.0",
     "tailwindcss": "^3.0.23",
-    "typescript": "^4.6.2"
+    "typescript": "^5.7.2"
   },
   "build": {
     "appId": "com.paletai.app",

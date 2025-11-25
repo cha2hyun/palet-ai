@@ -9,6 +9,7 @@ const isDev = !app.isPackaged;
 
 // 전역 window 변수
 let mainWindow: BrowserWindow | null = null;
+let zoomLevel = 0;
 
 function createWindow() {
   // 아이콘 경로 설정
@@ -48,8 +49,6 @@ function createWindow() {
   // mainWindow.webContents.openDevTools();
 
   // 앱 내부에서만 작동하는 줌 단축키 (다른 앱에 영향 없음)
-  let zoomLevel = 0;
-
   mainWindow.webContents.on('before-input-event', (event, input) => {
     // Cmd/Ctrl + Plus/= (확대)
     if ((input.control || input.meta) && (input.key === '+' || input.key === '=') && !input.shift) {
@@ -57,6 +56,7 @@ function createWindow() {
       zoomLevel += 0.1;
       if (mainWindow) {
         mainWindow.webContents.setZoomFactor(1 + zoomLevel);
+        mainWindow.webContents.send('zoom-level-changed', zoomLevel);
       }
     }
     // Cmd/Ctrl + Minus (축소)
@@ -65,6 +65,7 @@ function createWindow() {
       zoomLevel -= 0.1;
       if (mainWindow) {
         mainWindow.webContents.setZoomFactor(1 + zoomLevel);
+        mainWindow.webContents.send('zoom-level-changed', zoomLevel);
       }
     }
     // Cmd/Ctrl + 0 (리셋)
@@ -73,6 +74,7 @@ function createWindow() {
       zoomLevel = 0;
       if (mainWindow) {
         mainWindow.webContents.setZoomFactor(1);
+        mainWindow.webContents.send('zoom-level-changed', zoomLevel);
       }
     }
   });
@@ -90,6 +92,39 @@ function createWindow() {
 
   ipcMain.on('close', () => {
     mainWindow?.close();
+  });
+
+  // Zoom 컨트롤
+  ipcMain.on('zoom-in', () => {
+    if (mainWindow) {
+      zoomLevel += 0.1;
+      mainWindow.webContents.setZoomFactor(1 + zoomLevel);
+      mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+    }
+  });
+
+  ipcMain.on('zoom-out', () => {
+    if (mainWindow) {
+      zoomLevel -= 0.1;
+      mainWindow.webContents.setZoomFactor(1 + zoomLevel);
+      mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+    }
+  });
+
+  ipcMain.on('zoom-reset', () => {
+    if (mainWindow) {
+      zoomLevel = 0;
+      mainWindow.webContents.setZoomFactor(1);
+      mainWindow.webContents.send('zoom-level-changed', zoomLevel);
+    }
+  });
+
+  // 저장된 zoom 레벨 복원
+  ipcMain.on('restore-zoom-level', (_event, savedZoomLevel: number) => {
+    if (mainWindow && typeof savedZoomLevel === 'number') {
+      zoomLevel = savedZoomLevel;
+      mainWindow.webContents.setZoomFactor(1 + zoomLevel);
+    }
   });
 
   nativeTheme.themeSource = 'dark';

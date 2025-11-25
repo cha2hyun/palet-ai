@@ -14,7 +14,7 @@ export function useLocalStorage<T>(
   key: string,
   defaultValue: T,
   validator?: (value: unknown) => value is T
-): [T, (value: T) => void] {
+): [T, (value: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
       const savedValue = localStorage.getItem(key);

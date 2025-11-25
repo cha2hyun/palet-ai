@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 export interface WebviewElement extends HTMLElement {
   src: string;
@@ -45,12 +45,17 @@ export function useWebviewManager() {
       window.Main.removeLoading();
     }
 
+    let interval: number | null = null;
+    let timeout: number | null = null;
+
     const checkWebviewsReady = () => {
       const chatgptReady = chatgptRef.current !== null;
       const geminiReady = geminiRef.current !== null;
       const perplexityReady = perplexityRef.current !== null;
       const claudeReady = claudeRef.current !== null;
       const browserReady = browserRef.current !== null;
+
+      const allReady = chatgptReady && geminiReady && perplexityReady && claudeReady && browserReady;
 
       setWebviewsReady({
         chatgpt: chatgptReady,
@@ -59,18 +64,26 @@ export function useWebviewManager() {
         claude: claudeReady,
         browser: browserReady
       });
+
+      // 모든 webview가 준비되면 interval 조기 종료
+      if (allReady && interval !== null) {
+        clearInterval(interval);
+        if (timeout !== null) clearTimeout(timeout);
+      }
     };
 
-    const interval = setInterval(checkWebviewsReady, 500);
+    // 1000ms로 증가 (CPU 사용량 감소)
+    interval = window.setInterval(checkWebviewsReady, 1000);
     checkWebviewsReady();
 
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-    }, 5000);
+    // 최대 10초까지 체크
+    timeout = window.setTimeout(() => {
+      if (interval !== null) clearInterval(interval);
+    }, 10000);
 
     return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
+      if (interval !== null) clearInterval(interval);
+      if (timeout !== null) clearTimeout(timeout);
     };
   }, []);
 

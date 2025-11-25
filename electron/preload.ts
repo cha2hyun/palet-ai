@@ -170,6 +170,18 @@ const api = {
   Close: () => {
     ipcRenderer.send('close');
   },
+  ZoomIn: () => {
+    ipcRenderer.send('zoom-in');
+  },
+  ZoomOut: () => {
+    ipcRenderer.send('zoom-out');
+  },
+  ZoomReset: () => {
+    ipcRenderer.send('zoom-reset');
+  },
+  RestoreZoomLevel: (zoomLevel: number) => {
+    ipcRenderer.send('restore-zoom-level', zoomLevel);
+  },
   removeLoading: () => {
     removeLoading();
   },
@@ -177,7 +189,15 @@ const api = {
    * Provide an easier way to listen to events
    */
   on: (channel: string, callback: (data: any) => void) => {
-    ipcRenderer.on(channel, (_, data) => callback(data));
+    const listener = (_: any, data: any) => callback(data);
+    ipcRenderer.on(channel, listener);
+    return listener;
+  },
+  /**
+   * Remove event listener
+   */
+  removeListener: (channel: string, listener: any) => {
+    ipcRenderer.removeListener(channel, listener);
   },
   /**
    * Send prompt to AI services

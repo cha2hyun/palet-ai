@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import AppBar from './AppBar';
 import ServiceSelector from './components/ServiceSelector';
 import LayoutSelector from './components/LayoutSelector';
@@ -18,7 +18,7 @@ import {
 } from './hooks/useLocalStorage';
 import { useWebviewManager } from './hooks/useWebviewManager';
 import { useAIServices } from './hooks/useAIServices';
-import { useBrowser } from './hooks/useBrowser';
+import useBrowser from './hooks/useBrowser';
 import { useReleaseChecker } from './hooks/useReleaseChecker';
 
 function App() {
@@ -27,6 +27,36 @@ function App() {
 
   // 릴리즈 체크
   const { releaseInfo } = useReleaseChecker();
+
+  // Zoom 레벨 복원 및 저장
+  useEffect(() => {
+    if (!window.Main) return;
+
+    // 저장된 zoom 레벨 복원 (없으면 기본값 -1 사용)
+    const savedZoomLevel = localStorage.getItem('zoomLevel');
+    if (savedZoomLevel) {
+      const zoomLevel = parseFloat(savedZoomLevel);
+      window.Main.RestoreZoomLevel(zoomLevel);
+    } else {
+      // 최초 실행 시 기본값 -1로 설정 (1단계 축소)
+      localStorage.setItem('zoomLevel', '-1');
+      window.Main.RestoreZoomLevel(-1);
+    }
+
+    // zoom 레벨 변경 이벤트 리스너
+    const handleZoomLevelChanged = (zoomLevel: number) => {
+      localStorage.setItem('zoomLevel', zoomLevel.toString());
+    };
+
+    const listener = window.Main.on('zoom-level-changed', handleZoomLevelChanged);
+
+    // Cleanup: 이벤트 리스너 제거
+    return () => {
+      if (window.Main && listener) {
+        window.Main.removeListener('zoom-level-changed', listener);
+      }
+    };
+  }, []);
 
   // localStorage 연동 상태
   const [enabledServices, setEnabledServices] = useLocalStorage<EnabledServices>(
@@ -67,15 +97,15 @@ function App() {
     return 'grid grid-cols-2 grid-rows-2';
   }, [layoutType]);
 
-  // URL 변경 핸들러
+  // URL 변경 핸들러 (functional update로 최적화)
   const handleUrlChange = useCallback(
     (serviceName: string, url: string) => {
-      setLastUrls({
-        ...lastUrls,
+      setLastUrls((prev: LastUrls) => ({
+        ...prev,
         [serviceName]: url
-      });
+      }));
     },
-    [lastUrls, setLastUrls]
+    [setLastUrls]
   );
 
   // New Chat 핸들러 - 모든 서비스를 메인 URL로 리셋
@@ -303,6 +333,31 @@ function App() {
                 </svg>
                 <span className="text-xs font-medium text-green-400">v{releaseInfo.latestVersion}</span>
               </a>
+            )}
+
+            {/* Zoom 컨트롤 */}
+            {window.Main && (
+              <div className="flex items-center gap-1 h-10 px-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
+                <button
+                  onClick={() => window.Main.ZoomOut()}
+                  className="p-2 hover:bg-gray-800 rounded transition-colors"
+                  title="축소 (Cmd -)"
+                >
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                  </svg>
+                </button>
+
+                <button
+                  onClick={() => window.Main.ZoomIn()}
+                  className="p-2 hover:bg-gray-800 rounded transition-colors"
+                  title="확대 (Cmd +)"
+                >
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
             )}
           </div>
 
