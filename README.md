@@ -9,7 +9,7 @@
   
   **NO API KEY NEEDED**
   
-  <img src="Screenshot.jpg" alt="Palet AI Screenshot" width="800" />
+  <img src="resources/overview.gif" alt="Palet AI Screenshot" width="800" />
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
   ![Platform](https://img.shields.io/badge/platform-macOS%20ARM64-blue.svg)

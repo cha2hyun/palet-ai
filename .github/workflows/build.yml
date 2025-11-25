@@ -43,12 +43,17 @@ jobs:
 
             ### Downloads
             - **macOS (ARM64)**: `palet-ai-macOS-arm64.zip` - Apple Silicon (M1/M2/M3)
+            - **Windows (x86/x64)**: `Palet-AI-Setup.exe` - Portable installer for Windows
             
             ### Installation Notes
             
             **macOS:**
             - Recommended: Install via Homebrew `brew install --cask cha2hyun/tap/palet-ai`
             - Or download directly and run: `xattr -cr ~/Downloads/Palet\ AI.app`
+            
+            **Windows:**
+            - Download `Palet-AI-Setup.exe` and run it
+            - No installation required - it's a portable app
           draft: false
           prerelease: false
 
@@ -94,8 +99,44 @@ jobs:
           asset_name: palet-ai-macOS-arm64.zip
           asset_content_type: application/zip
 
+  build-windows:
+    needs: create-release
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build Windows
+        run: yarn dist:win
+
+      - name: Rename Windows installer
+        run: |
+          $version = node -p "require('./package.json').version"
+          Move-Item "dist/Palet AI $version.exe" "dist/Palet-AI-Setup.exe"
+
+      - name: Upload Windows Installer
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./dist/Palet-AI-Setup.exe
+          asset_name: Palet-AI-Setup.exe
+          asset_content_type: application/octet-stream
+
   update-homebrew-tap:
-    needs: [create-release, build-mac]
+    needs: [create-release, build-mac, build-windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write

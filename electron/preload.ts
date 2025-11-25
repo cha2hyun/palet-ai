@@ -1,11 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
 
-/**
- * Using the ipcRenderer directly in the browser through the contextBridge ist not really secure.
- * I advise using the Main/api way !!
- */
-contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
-
 // eslint-disable-next-line no-undef
 function domReady(condition: DocumentReadyState[] = ['complete', 'interactive']) {
   return new Promise((resolve) => {
@@ -150,7 +144,6 @@ domReady().then(appendLoading);
 declare global {
   interface Window {
     Main: typeof api;
-    ipcRenderer: typeof ipcRenderer;
   }
 }
 

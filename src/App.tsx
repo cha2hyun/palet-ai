@@ -19,10 +19,14 @@ import {
 import { useWebviewManager } from './hooks/useWebviewManager';
 import { useAIServices } from './hooks/useAIServices';
 import { useBrowser } from './hooks/useBrowser';
+import { useReleaseChecker } from './hooks/useReleaseChecker';
 
 function App() {
   const [prompt, setPrompt] = useState('');
   const [isSending, setIsSending] = useState(false);
+
+  // 릴리즈 체크
+  const { releaseInfo } = useReleaseChecker();
 
   // localStorage 연동 상태
   const [enabledServices, setEnabledServices] = useLocalStorage<EnabledServices>(
@@ -66,12 +70,12 @@ function App() {
   // URL 변경 핸들러
   const handleUrlChange = useCallback(
     (serviceName: string, url: string) => {
-      setLastUrls((prev) => ({
-        ...prev,
+      setLastUrls({
+        ...lastUrls,
         [serviceName]: url
-      }));
+      });
     },
-    [setLastUrls]
+    [lastUrls, setLastUrls]
   );
 
   // New Chat 핸들러 - 모든 서비스를 메인 URL로 리셋
@@ -88,15 +92,19 @@ function App() {
 
     // 각 webview를 메인 URL로 리로드
     if (chatgptRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (chatgptRef.current as any).loadURL(AI_SERVICES.chatgpt.url);
     }
     if (geminiRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (geminiRef.current as any).loadURL(AI_SERVICES.gemini.url);
     }
     if (perplexityRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (perplexityRef.current as any).loadURL(AI_SERVICES.perplexity.url);
     }
     if (claudeRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (claudeRef.current as any).loadURL(AI_SERVICES.claude.url);
     }
   }, [setLastUrls, chatgptRef, geminiRef, perplexityRef, claudeRef]);
@@ -275,6 +283,27 @@ function App() {
               </svg>
               <span className="text-xs font-medium text-gray-400">GitHub</span>
             </a>
+
+            {/* 새 릴리즈 알림 */}
+            {releaseInfo && releaseInfo.hasNewVersion && (
+              <a
+                href={releaseInfo.releaseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 h-10 px-4 py-2 bg-green-500/20 backdrop-blur-sm rounded-lg border border-green-500/50 hover:border-green-500 transition-colors animate-pulse"
+                title={`새 버전 ${releaseInfo.latestVersion} 사용 가능`}
+              >
+                <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
+                </svg>
+                <span className="text-xs font-medium text-green-400">v{releaseInfo.latestVersion}</span>
+              </a>
+            )}
           </div>
 
           {/* 입력창 및 전송 버튼 */}
