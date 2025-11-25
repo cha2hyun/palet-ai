@@ -11,11 +11,22 @@ const isDev = !app.isPackaged;
 let mainWindow: BrowserWindow | null = null;
 let zoomLevel = 0;
 
+// 줌 레벨 제한 (zoomFactor = 1 + zoomLevel, 범위: 0.1 ~ 4.0)
+const MIN_ZOOM_LEVEL = -0.9;
+const MAX_ZOOM_LEVEL = 3.0;
+
+function clampZoomLevel(level: number): number {
+  return Math.max(MIN_ZOOM_LEVEL, Math.min(MAX_ZOOM_LEVEL, level));
+}
+
 function createWindow() {
-  // 아이콘 경로 설정
-  const appPath = app.getAppPath();
-  const iconPath = join(appPath, 'src/assets/icons/Icon.png');
-  const icon = nativeImage.createFromPath(iconPath);
+  // 아이콘 경로 설정 (개발 모드에서만)
+  let icon;
+  if (isDev) {
+    const appPath = app.getAppPath();
+    const iconPath = join(appPath, 'src/assets/icons/Icon.png');
+    icon = nativeImage.createFromPath(iconPath);
+  }
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -26,7 +37,7 @@ function createWindow() {
     show: true,
     resizable: true,
     fullscreenable: true,
-    icon,
+    ...(icon && { icon }),
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       webviewTag: true,
@@ -53,7 +64,7 @@ function createWindow() {
     // Cmd/Ctrl + Plus/= (확대)
     if ((input.control || input.meta) && (input.key === '+' || input.key === '=') && !input.shift) {
       event.preventDefault();
-      zoomLevel += 0.1;
+      zoomLevel = clampZoomLevel(zoomLevel + 0.1);
       if (mainWindow) {
         mainWindow.webContents.setZoomFactor(1 + zoomLevel);
         mainWindow.webContents.send('zoom-level-changed', zoomLevel);
@@ -62,7 +73,7 @@ function createWindow() {
     // Cmd/Ctrl + Minus (축소)
     else if ((input.control || input.meta) && input.key === '-' && !input.shift) {
       event.preventDefault();
-      zoomLevel -= 0.1;
+      zoomLevel = clampZoomLevel(zoomLevel - 0.1);
       if (mainWindow) {
         mainWindow.webContents.setZoomFactor(1 + zoomLevel);
         mainWindow.webContents.send('zoom-level-changed', zoomLevel);
@@ -97,7 +108,7 @@ function createWindow() {
   // Zoom 컨트롤
   ipcMain.on('zoom-in', () => {
     if (mainWindow) {
-      zoomLevel += 0.1;
+      zoomLevel = clampZoomLevel(zoomLevel + 0.1);
       mainWindow.webContents.setZoomFactor(1 + zoomLevel);
       mainWindow.webContents.send('zoom-level-changed', zoomLevel);
     }
@@ -105,7 +116,7 @@ function createWindow() {
 
   ipcMain.on('zoom-out', () => {
     if (mainWindow) {
-      zoomLevel -= 0.1;
+      zoomLevel = clampZoomLevel(zoomLevel - 0.1);
       mainWindow.webContents.setZoomFactor(1 + zoomLevel);
       mainWindow.webContents.send('zoom-level-changed', zoomLevel);
     }
@@ -122,7 +133,7 @@ function createWindow() {
   // 저장된 zoom 레벨 복원
   ipcMain.on('restore-zoom-level', (_event, savedZoomLevel: number) => {
     if (mainWindow && typeof savedZoomLevel === 'number') {
-      zoomLevel = savedZoomLevel;
+      zoomLevel = clampZoomLevel(savedZoomLevel);
       mainWindow.webContents.setZoomFactor(1 + zoomLevel);
     }
   });
@@ -134,8 +145,8 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // macOS Dock 아이콘 설정
-  if (process.platform === 'darwin') {
+  // macOS Dock 아이콘 설정 (개발 모드에서만)
+  if (isDev && process.platform === 'darwin') {
     const appPath = app.getAppPath();
     const iconPath = join(appPath, 'src/assets/icons/Icon.png');
     const icon = nativeImage.createFromPath(iconPath);
