@@ -13,7 +13,7 @@
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
   ![Platform](https://img.shields.io/badge/platform-macOS%20ARM64-blue.svg)
-  ![Version](https://img.shields.io/badge/version-1.0.7-green.svg)
+  ![Version](https://img.shields.io/badge/version-1.0.8-green.svg)
   [![Homebrew](https://img.shields.io/badge/homebrew-available-orange.svg)](https://github.com/cha2hyun/homebrew-tap)
   
 </div>

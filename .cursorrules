@@ -1,0 +1,744 @@
+# PaletAI Project Rules
+
+## 🚫 Critical Rules - NEVER DO THESE
+
+### Git Workflow
+
+- **NEVER push to ANY branch without user confirmation** ⚠️
+
+  - This is EXTREMELY IMPORTANT
+  - Always ask the user before pushing: "Ready to push to [branch]?"
+  - Wait for explicit approval before executing `git push`
+  - Only commit locally until user approves the push
+
+- **NEVER push directly to `deploy` branch**
+  - The `deploy` branch is for automatic releases only
+  - Always work on `main` branch
+  - GitHub Actions automatically handles deployment when `deploy` branch is updated through proper workflow
+
+### Code Quality
+
+- **NEVER use emojis in code** unless explicitly requested by the user
+- **ALWAYS run linter checks** after making changes
+- **ALWAYS use default exports** for React hooks and components when there's only one export
+
+---
+
+## 📝 Git Commit Message Convention
+
+### Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types (Required)
+
+- **feat**: New feature or functionality
+
+  - Example: `feat: Add Mistral AI service support`
+  - Example: `feat(ui): Add zoom label to controls`
+
+- **fix**: Bug fix
+
+  - Example: `fix: Resolve race condition in message sending`
+  - Example: `fix(layout): Auto-switch to row when grid exceeds 4 services`
+
+- **docs**: Documentation changes only
+
+  - Example: `docs: Update README with Mistral AI`
+  - Example: `docs(changelog): Add v1.0.7 release notes`
+
+- **style**: Code style changes (formatting, no logic change)
+
+  - Example: `style: Format WebviewPanel component`
+  - Example: `style(hooks): Improve code readability`
+
+- **refactor**: Code refactoring (no feature change or bug fix)
+
+  - Example: `refactor: Extract sendToAI logic to hook`
+  - Example: `refactor(app): Simplify control layout structure`
+
+- **perf**: Performance improvements
+
+  - Example: `perf: Optimize webview loading time`
+  - Example: `perf(send): Increase timeout to prevent race condition`
+
+- **test**: Adding or updating tests
+
+  - Example: `test: Add unit tests for useAIServices`
+
+- **chore**: Build process or auxiliary tool changes
+
+  - Example: `chore: Update dependencies`
+  - Example: `chore(build): Configure macOS ARM64 build`
+
+- **ci**: CI/CD configuration changes
+  - Example: `ci: Add auto-changelog extraction to release workflow`
+
+### Scope (Optional)
+
+- Component or file being modified: `ui`, `hooks`, `layout`, `app`, `build`, etc.
+
+### Subject (Required)
+
+- Use imperative mood: "Add" not "Added" or "Adds"
+- No period at the end
+- Keep under 50 characters
+- Be clear and descriptive
+
+### Body (Optional)
+
+- Explain what and why, not how
+- Wrap at 72 characters
+- Can include multiple paragraphs
+
+### Footer (Optional)
+
+- Reference issues: `Closes #123`, `Fixes #456`
+- Breaking changes: `BREAKING CHANGE: description`
+
+### Examples
+
+```bash
+# Simple feature
+feat: Add external link handler for browser
+
+# Feature with scope and body
+feat(ui): Add Reset button to Developer Tools
+
+Moved Reset button from main control area to Dev Tools section.
+This reduces clutter in the main UI and groups related functionality.
+
+# Bug fix with issue reference
+fix(send): Prevent duplicate prompts with 1s timeout
+
+Increased timeout from 300ms to 1000ms to handle 5 services.
+Wrapped logic in try-finally for proper error handling.
+
+Fixes #789
+
+# Documentation update
+docs: Add comprehensive .cursorrules for project guidelines
+
+# Breaking change
+feat: Change default layout to Row
+
+BREAKING CHANGE: Default layout changed from Column to Row.
+Users who never changed layout will see Row layout on next launch.
+```
+
+### Rules
+
+- **ALWAYS write commit messages in English**
+- **ALWAYS use conventional commit format**
+- **ALWAYS be specific and descriptive**
+- Commits should be atomic (one logical change per commit)
+- Multiple related changes can be in one commit, but unrelated changes should be separate
+
+---
+
+## 🎯 Project Structure
+
+### Core Architecture
+
+- **Framework**: Electron + React + TypeScript + Vite
+- **UI Library**: HeroUI (NextUI fork)
+- **State Management**: React hooks + localStorage
+- **Webview Management**: Electron webview elements for AI service iframes
+
+### Key Directories
+
+```
+src/
+├── components/         # React components
+├── constants/          # AI service configurations
+├── hooks/              # Custom React hooks
+└── App.tsx            # Main application component
+
+electron/
+├── index.ts           # Main Electron process
+└── preload.ts         # Preload script for IPC
+```
+
+---
+
+## ➕ Adding a New AI Service
+
+When adding a new AI service (e.g., "NewAI"), update these files in order:
+
+### 1. **src/constants/aiServices.ts**
+
+```typescript
+export const AI_SERVICES: Record<string, AIServiceConfig> = {
+  // ... existing services
+  newai: {
+    name: 'newai',
+    displayName: 'NewAI',
+    url: 'https://newai.example.com/',
+    partition: 'persist:newai',
+    selector: 'textarea[placeholder="..."]', // Input field selector
+    buttonSelector: 'button[type="submit"]', // Send button selector
+    color: 'blue' // Color for UI elements
+  }
+};
+```
+
+### 2. **src/hooks/useLocalStorage.ts**
+
+- Add to `EnabledServices` interface: `newai: boolean;`
+- Add to `LastUrls` interface: `newai: string;`
+- Update `isValidEnabledServices()` to include `'newai'`
+- Update `isValidLastUrls()` to include `'newai'`
+
+### 3. **src/hooks/useWebviewManager.ts**
+
+- Add to `WebviewRefs`: `newaiRef: React.RefObject<WebviewElement>;`
+- Add to `WebviewsReady`: `newai: boolean;`
+- Create ref: `const newaiRef = useRef<WebviewElement>(null);`
+- Update `checkWebviewsReady` to check `newaiReady`
+- Return `newaiRef` in the refs object
+
+### 4. **src/App.tsx**
+
+- Update `lastUrls` initial state to include: `newai: AI_SERVICES.newai.url`
+- Add `newaiRef` to the destructured `refs`
+- Add to `handleNewChat`: `newaiRef.current.loadURL(AI_SERVICES.newai.url)`
+- Add to `handleSendToAll`: send logic for NewAI
+- Add `<WebviewPanel>` component for NewAI
+- Update default `enabledServices` if needed
+
+### 5. **src/components/ServiceSelector.tsx**
+
+- Add a new `Checkbox` for NewAI with tooltip support
+
+### 6. **src/components/DeveloperTools.tsx**
+
+- Add `newaiRef` to `DeveloperToolsProps`
+- Add DevTools and DOM analysis buttons for NewAI
+
+### 7. **README.md**
+
+- Add NewAI to the list of supported services
+- Update feature descriptions
+
+### 8. **package.json**
+
+- Bump version number (follow semantic versioning)
+
+### 9. **CHANGELOG.md**
+
+- Add entry under new version section describing the addition
+
+---
+
+## 📝 Version Management
+
+### Semantic Versioning (MAJOR.MINOR.PATCH)
+
+- **MAJOR** (x.0.0): Breaking changes, major overhauls
+- **MINOR** (0.x.0): New features, new AI services
+- **PATCH** (0.0.x): Bug fixes, minor improvements
+
+### When Updating Version:
+
+1. **package.json**: Update `version` field
+   - This is the ONLY file you need to update for version number
+   - `src/hooks/useReleaseChecker.ts` automatically reads from `package.json`
+   - No need to manually update version constants elsewhere
+2. **CHANGELOG.md**: Add new version section at the top
+3. **README.md**: Update version badge
+4. Commit changes to `main` branch
+5. **DO NOT** manually push to `deploy` branch
+6. GitHub Actions will handle the release automatically
+
+### Version Auto-Sync
+
+**Important**: The app version is automatically synced from `package.json`:
+
+- `src/hooks/useReleaseChecker.ts` imports version from `package.json`
+- You only need to update the version in ONE place: `package.json`
+- Never hardcode version numbers in source files
+
+---
+
+## 📋 CHANGELOG.md Format
+
+Always use this structure:
+
+```markdown
+# Changelog
+
+## [1.0.X] - YYYY-MM-DD
+
+### ✨ Features
+
+- Feature description with details
+
+### 🎨 UI/UX Improvements
+
+- UI/UX improvement description
+
+### 🐛 Bug Fixes
+
+- Bug fix description
+
+### 🔄 Performance
+
+- Performance improvement description
+
+### ⚙️ Developer Experience
+
+- DX improvement description
+
+## [Previous versions...]
+```
+
+**Key Points:**
+
+- Use emoji prefixes (✨ 🎨 🐛 🔄 ⚙️)
+- Be specific and detailed
+- Group related changes together
+- Include technical details when relevant
+
+---
+
+## 🎨 Layout Constraints
+
+### Grid Layout (2x2)
+
+- **Maximum 4 services** can be selected
+- Automatically switches to "Row" layout if > 4 services are selected
+- Disable Grid option in LayoutSelector when > 4 services
+- Show tooltip: "Grid layout supports up to 4 selections"
+- Disable service checkboxes in ServiceSelector when at limit
+
+### Implementation
+
+- `ServiceSelector`: Check `layoutType === 'grid' && selectedCount >= 4`
+- `LayoutSelector`: Check `selectedCount > 4` to disable Grid
+- `App.tsx`: Auto-switch useEffect when grid + > 4 services
+
+---
+
+## 🔧 Common Patterns
+
+### localStorage Keys
+
+```typescript
+const STORAGE_KEYS = {
+  ENABLED_SERVICES: 'enabledServices',
+  LAST_URLS: 'lastUrls',
+  LAYOUT_TYPE: 'layoutType',
+  ZOOM_LEVEL: 'zoomLevel'
+};
+```
+
+### Sending Messages to AI Services
+
+```typescript
+await sendToAI(
+  serviceRef,
+  AI_SERVICES.service.selector,
+  AI_SERVICES.service.buttonSelector,
+  prompt,
+  AI_SERVICES.service.displayName
+);
+```
+
+### Timeout for Send Operations
+
+- Use `setTimeout` with 1000ms delay in `finally` block
+- Prevents race conditions when sending to multiple services
+- Ensures `isSending` state is properly managed
+
+---
+
+## 🧪 Testing Checklist
+
+Before committing changes:
+
+- [ ] Run `npm run lint` - no errors
+- [ ] Test all enabled services receive messages
+- [ ] Test Grid layout with 4 and 5 services
+- [ ] Test New Chat functionality
+- [ ] Test zoom controls (if modified)
+- [ ] Test DevTools for each service
+- [ ] Test Reset functionality
+- [ ] Verify localStorage persistence
+
+---
+
+## 🔗 External Links
+
+### Opening Links in Default Browser
+
+Always use `window.Main.OpenExternalLink(url)` for external links:
+
+```typescript
+<button onClick={() => window.Main.OpenExternalLink('https://...')}>Link Text</button>
+```
+
+**Never use** `<a href="...">` for external links in the Electron app.
+
+---
+
+## 🎯 UI/UX Guidelines
+
+### Tooltips
+
+- Use HeroUI's `Tooltip` component
+- Set `delay={0}` and `closeDelay={0}` for instant response
+- Use `bg-gray-800 text-white text-xs px-2 py-1 rounded` for consistent styling
+- Show informative messages, especially for disabled states
+
+### Buttons
+
+- Use semantic colors: primary (blue), danger (red), secondary (gray)
+- Include `aria-label` for icon-only buttons
+- Add hover/active states for feedback
+- Use appropriate size variants (`sm`, `md`, `lg`)
+
+### Responsive Design
+
+- Use `flex-wrap` for control areas that should wrap on small screens
+- Test on different screen sizes
+- Hide non-essential text on mobile with `max-sm:hidden`
+
+---
+
+## 🔍 Finding DOM Selectors
+
+When adding a new AI service:
+
+1. Open the AI service website in the app
+2. Click "Dev Tools" for that service
+3. Click "Analyze DOM" to log all input and button elements
+4. Check the console for logged selectors
+5. Use the most specific and stable selector
+6. Test with `buttonSelector` fallbacks if needed (comma-separated)
+
+Example:
+
+```typescript
+selector: 'div.ProseMirror[contenteditable="true"]',
+buttonSelector: 'button[type="submit"][aria-label="Send"], button[type="submit"]'
+```
+
+---
+
+## ⚡ Performance Considerations
+
+### Webview Management
+
+- Use `useCallback` for functions passed to webviews
+- Memoize computed values with `useMemo`
+- Check webview ready state before operations
+- Handle webview errors gracefully
+
+### State Updates
+
+- Batch related state updates
+- Use functional updates for state depending on previous state
+- Debounce frequent updates when appropriate
+
+---
+
+## 🐛 Common Issues & Solutions
+
+### Issue: "Element not found" when sending
+
+**Solution**: Check if webview is ready and selector is correct
+
+### Issue: Grid layout breaks with 5+ services
+
+**Solution**: Auto-switch to Row layout (already implemented)
+
+### Issue: Zoom level resets on restart
+
+**Solution**: Ensure `zoomLevel` is saved to localStorage
+
+### Issue: Login sessions lost
+
+**Solution**: Check webview `partition` is set correctly
+
+### Issue: External links open in app
+
+**Solution**: Use `window.Main.OpenExternalLink()` instead of `<a href>`
+
+---
+
+## 📦 Build & Release
+
+### Building the App
+
+```bash
+# macOS ARM64 (Apple Silicon)
+npm run build:mac
+
+# Windows
+npm run build:win
+
+# All platforms
+npm run build
+```
+
+### 🚀 Complete Release Checklist
+
+Before releasing a new version, **ALWAYS** go through this checklist:
+
+#### 1. Pre-Release Verification
+
+- [ ] All features/fixes are tested and working
+- [ ] Run `npm run lint` - no errors
+- [ ] Run `npm run build:mac` (or appropriate platform) - successful build
+- [ ] Test the built app locally - verify all features work
+
+#### 2. Version Bump
+
+- [ ] Update `package.json` version following semantic versioning
+  - MAJOR (x.0.0): Breaking changes
+  - MINOR (0.x.0): New features, new AI services
+  - PATCH (0.0.x): Bug fixes, minor improvements
+
+#### 3. CHANGELOG.md Update
+
+- [ ] Add new version section at the top: `## [X.X.X] - YYYY-MM-DD`
+- [ ] List all changes under appropriate categories:
+  - ✨ Features
+  - 🎨 UI/UX Improvements
+  - 🐛 Bug Fixes
+  - 🔄 Performance
+  - ⚙️ Developer Experience
+- [ ] Be specific and detailed in descriptions
+- [ ] Include technical details when relevant
+- [ ] Review the changelog for completeness
+
+#### 4. README.md Update
+
+**ALWAYS check if README needs updates:**
+
+- [ ] Version badge - update to new version
+- [ ] New AI services - add to supported services list
+- [ ] New features - add to features section
+- [ ] Installation instructions - check if still accurate
+- [ ] Screenshots - update if UI changed significantly
+- [ ] Dependencies - update if major changes
+- [ ] Usage examples - add new features if applicable
+
+#### 5. Release Notes Preparation
+
+**Verify GitHub Release Notes will include:**
+
+- [ ] All changes from CHANGELOG.md for this version
+- [ ] Clear and user-friendly descriptions
+- [ ] Installation instructions (auto-generated from workflow)
+- [ ] Download links (auto-generated from workflow)
+- [ ] Breaking changes highlighted (if any)
+
+#### 6. Commit & Push (With User Approval)
+
+- [ ] Commit all changes with proper commit message:
+  ```bash
+  git add package.json CHANGELOG.md README.md
+  git commit -m "chore: Bump version to X.X.X"
+  ```
+- [ ] **ASK USER**: "Ready to push to main branch?"
+- [ ] **WAIT FOR APPROVAL** before pushing
+- [ ] Push to main: `git push origin main`
+
+#### 7. Deploy (NEVER PUSH DIRECTLY)
+
+- [ ] **DO NOT** push to `deploy` branch manually
+- [ ] Ask user if they want to trigger release now
+- [ ] If yes, user or maintainer will handle `deploy` branch update
+- [ ] GitHub Actions will automatically:
+  - Build for all platforms
+  - Create GitHub release
+  - Upload build artifacts
+  - Update Homebrew tap
+
+#### 8. Post-Release Verification
+
+- [ ] Check GitHub Actions workflow completed successfully
+- [ ] Verify release appears on GitHub releases page
+- [ ] Verify release notes are correct and complete
+- [ ] Test download links work
+- [ ] Verify Homebrew tap updated (if applicable)
+
+### Common Release Scenarios
+
+#### New AI Service Release
+
+```bash
+# Files to update:
+✓ src/constants/aiServices.ts
+✓ src/hooks/useLocalStorage.ts
+✓ src/hooks/useWebviewManager.ts
+✓ src/App.tsx
+✓ src/components/ServiceSelector.tsx
+✓ src/components/DeveloperTools.tsx
+✓ package.json (version bump)
+✓ CHANGELOG.md (add service to ✨ Features)
+✓ README.md (add to supported services list)
+```
+
+#### Bug Fix Release
+
+```bash
+# Files to update:
+✓ Fix the bug in relevant files
+✓ package.json (PATCH version bump)
+✓ CHANGELOG.md (add to 🐛 Bug Fixes)
+✓ README.md (usually no changes needed)
+```
+
+#### UI/UX Improvement Release
+
+```bash
+# Files to update:
+✓ Update UI components
+✓ package.json (PATCH or MINOR version bump)
+✓ CHANGELOG.md (add to 🎨 UI/UX Improvements)
+✓ README.md (update screenshots if significant changes)
+```
+
+### Homebrew Tap Update
+
+- Automatically handled by GitHub Actions
+- Updates `cha2hyun/homebrew-tap` repository
+- Users can install with: `brew install --cask cha2hyun/tap/palet-ai`
+
+### Emergency Rollback
+
+If a release has critical issues:
+
+1. **DO NOT PANIC**
+2. Identify the issue
+3. Create a hotfix branch if needed
+4. Follow the release checklist for a patch version
+5. Test thoroughly before releasing
+6. Consider removing the broken release from GitHub
+
+### Release Notes Quality Check
+
+Before finalizing release, ensure release notes:
+
+- [ ] Are written in user-friendly language (not too technical)
+- [ ] Highlight key features/improvements first
+- [ ] Include "why" for major changes (user benefit)
+- [ ] List breaking changes prominently (if any)
+- [ ] Provide upgrade instructions (if needed)
+- [ ] Link to full CHANGELOG.md for detailed changes
+
+---
+
+## 🎓 Key Learnings from Development
+
+### Race Condition in Message Sending
+
+- **Problem**: `setTimeout` too short (300ms) for 5 services
+- **Solution**: Wrap in try-finally, use 1000ms timeout
+- **Reason**: Each service takes 100+ms, sequential await needed
+
+### Layout Auto-Switching
+
+- **Problem**: Users with grid + 5 services had broken layout
+- **Solution**: useEffect to auto-switch to row when invalid
+- **Location**: App.tsx, runs on layout/services change
+
+### Default Export vs Named Export
+
+- **Rule**: Use default export for single-export files
+- **Reason**: ESLint rule "Prefer default export"
+- **Example**: useAIServices.ts changed to default export
+
+### Zoom Level Default
+
+- **Change**: -1 → 0 for first launch
+- **Reason**: Users expect normal size on first use
+- **Implementation**: Check in useEffect, set 0 if not exists
+
+---
+
+## 💡 Best Practices
+
+1. **Always validate localStorage data** - Use type guards
+2. **Handle webview errors** - Check ready state first
+3. **Test with all services** - Don't assume one works for all
+4. **Use semantic commits** - feat:, fix:, docs:, refactor:, etc.
+5. **Update all related files** - Don't leave partial implementations
+6. **Check linter before commit** - Fix warnings and errors
+7. **Document complex logic** - Future you will thank you
+8. **Test edge cases** - Empty states, max limits, errors
+
+---
+
+## 🔒 Security Notes
+
+- Each AI service uses isolated partition (`persist:servicename`)
+- Webviews are sandboxed from main process
+- No API keys stored - users login directly to services
+- Local storage only contains UI preferences and URLs
+
+---
+
+## 📚 Additional Resources
+
+- **Electron Docs**: https://www.electronjs.org/docs
+- **React Docs**: https://react.dev
+- **HeroUI**: https://github.com/bolio-ui/bolio-ui (NextUI fork)
+- **TypeScript**: https://www.typescriptlang.org/docs
+
+---
+
+## ✅ Pre-Commit Checklist
+
+Before every commit, ensure:
+
+- [ ] Code compiles without TypeScript errors
+- [ ] No ESLint warnings or errors
+- [ ] All modified files are formatted consistently
+- [ ] No console.log() statements left in production code
+- [ ] Comments are clear and necessary
+- [ ] Variable names are descriptive
+- [ ] No hardcoded values that should be constants
+- [ ] Git commit message follows conventions (feat:, fix:, docs:, etc.)
+- [ ] Commit message is in English and descriptive
+- [ ] Related files (CHANGELOG, README, package.json) are updated
+
+## ⚠️ Pre-Push Checklist
+
+**CRITICAL: Before EVERY push, ALWAYS:**
+
+- [ ] **ASK USER FOR PERMISSION**: "Ready to push to [branch]?"
+- [ ] **WAIT FOR EXPLICIT APPROVAL** - Never push without it
+- [ ] Verify you're on the correct branch (usually `main`)
+- [ ] Double-check you're NOT pushing to `deploy` branch
+- [ ] Review all commits to be pushed
+- [ ] Ensure no sensitive information in commits
+- [ ] Confirm all tests pass
+- [ ] Verify lint checks are clean
+
+**Never, ever push without asking first. This is non-negotiable.**
+
+---
+
+## 🎯 Remember These Key Points
+
+1. **Git Workflow**: ALWAYS ask before pushing. NEVER push to `deploy` directly.
+2. **Commit Messages**: Write in English, follow conventional commit format, be descriptive.
+3. **Release Process**: Follow the complete release checklist. Check README and CHANGELOG every time.
+4. **Multi-Service Architecture**: This app runs multiple AI services simultaneously - consider performance and UX in every change.
+5. **User Experience First**: Every feature should enhance, not complicate, the user's workflow.
+6. **Test Thoroughly**: Don't assume one service works for all. Test with all enabled services.
+7. **Document Changes**: Update README, CHANGELOG, and code comments appropriately.
+8. **Security & Isolation**: Each service uses isolated partitions. Maintain this separation.
+
+---
+
+**When in doubt, ask the user. It's better to over-communicate than to make assumptions.**

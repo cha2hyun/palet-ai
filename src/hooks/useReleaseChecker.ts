@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import packageJson from '../../package.json';
 
 interface ReleaseInfo {
   hasNewVersion: boolean;
@@ -7,7 +8,7 @@ interface ReleaseInfo {
   releaseUrl: string;
 }
 
-const CURRENT_VERSION = '1.0.6'; // package.json의 버전과 동일하게 유지
+const CURRENT_VERSION = packageJson.version;
 const GITHUB_API_URL = 'https://api.github.com/repos/cha2hyun/palet-ai/releases/latest';
 
 // 버전 비교 함수 (1.0.4 > 1.0.3 => 1, 1.0.3 = 1.0.3 => 0, 1.0.2 < 1.0.3 => -1)

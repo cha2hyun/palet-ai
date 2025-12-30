@@ -45,23 +45,23 @@ jobs:
           release_name: Palet AI v${{ steps.version.outputs.VERSION }}
           body: |
             ## Palet AI v${{ steps.version.outputs.VERSION }}
-            
+
             ${{ steps.changelog.outputs.CHANGELOG }}
-            
+
             ---
-            
+
             ## 📦 Downloads
-            
+
             - **macOS (ARM64)**: `palet-ai-macOS-arm64.zip` - For Apple Silicon (M1/M2/M3)
             - **Windows (x86/x64)**: `Palet-AI-Setup.exe` - Portable installer
-            
+
             ## 📝 Installation
-            
+
             ### macOS (Recommended via Homebrew)
             ```bash
             brew install --cask cha2hyun/tap/palet-ai
             ```
-            
+
             ### macOS (Direct Download)
             1. Download `palet-ai-macOS-arm64.zip`
             2. Unzip and run:
@@ -69,22 +69,22 @@ jobs:
             xattr -cr ~/Downloads/Palet\ AI.app
             ```
             3. Drag to Applications folder
-            
+
             ### Windows
             - Download `Palet-AI-Setup.exe` and run it
             - No installation required - portable app
-            
+
             ## 🎯 Key Features
-            
+
             - **5 AI Services**: ChatGPT, Gemini, Perplexity, Claude, Mistral AI
             - **No API Key Needed**: Just login and start using
             - **Multiple Layouts**: Column, Row, or 2x2 Grid
             - **Dark Theme**: Eye-friendly minimalist UI
             - **Zoom Controls**: App-only shortcuts (Cmd/Ctrl +/-)
             - **Session Persistence**: Auto-save login sessions
-            
+
             ---
-            
+
             📄 **Full Changelog**: [CHANGELOG.md](https://github.com/cha2hyun/palet-ai/blob/main/CHANGELOG.md)
           draft: false
           prerelease: false
@@ -205,7 +205,7 @@ jobs:
           cd homebrew-tap
           sed -i "s/version \".*\"/version \"${{ steps.version.outputs.VERSION }}\"/" Casks/palet-ai.rb
           sed -i "s/sha256 \".*\"/sha256 \"${{ steps.sha256.outputs.SHA256 }}\"/" Casks/palet-ai.rb
-          
+
           echo "Updated Cask formula:"
           head -10 Casks/palet-ai.rb
 

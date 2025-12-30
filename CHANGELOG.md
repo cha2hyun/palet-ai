@@ -2,6 +2,29 @@
 
 All notable changes to Palet AI will be documented in this file.
 
+## [1.0.8] - 2024-12-30
+
+### ⚙️ Developer Experience
+
+- **Comprehensive Project Guidelines**: Added `.cursorrules` file with complete project documentation
+  - Git workflow rules: Never push to deploy branch, always ask user before pushing
+  - Detailed commit message conventions following Conventional Commits format
+  - Complete 8-step release checklist with README and release notes verification
+  - Step-by-step guide for adding new AI services (9 files to update)
+  - Version management and CHANGELOG formatting standards
+  - UI/UX guidelines, common patterns, and troubleshooting tips
+  - Pre-commit and pre-push checklists
+
+### 🐛 Bug Fixes
+
+- **Version Auto-Sync**: Fixed app version synchronization issue
+  - App version now automatically reads from `package.json` via import
+  - Eliminated need for manual version updates in `useReleaseChecker.ts`
+  - Prevents version mismatch between package.json and app display
+  - Ensures release checker correctly identifies current version
+
+---
+
 ## [1.0.7] - 2024-12-30
 
 ### ✨ Features
