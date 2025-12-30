@@ -5,7 +5,7 @@
   
   **The easiest way to use multiple AI services simultaneously in one screen**
   
-  Run and compare ChatGPT, Google Gemini, Claude, and Perplexity side by side. 
+  Run and compare ChatGPT, Google Gemini, Claude, Perplexity, and Mistral AI side by side. 
   
   **NO API KEY NEEDED**
   
@@ -13,7 +13,7 @@
   
   [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
   ![Platform](https://img.shields.io/badge/platform-macOS%20ARM64-blue.svg)
-  ![Version](https://img.shields.io/badge/version-1.0.3-green.svg)
+  ![Version](https://img.shields.io/badge/version-1.0.7-green.svg)
   [![Homebrew](https://img.shields.io/badge/homebrew-available-orange.svg)](https://github.com/cha2hyun/homebrew-tap)
   
 </div>
@@ -28,7 +28,7 @@ Just log in to each AI service and start using immediately. No complex API setup
 
 ### Ask Multiple AIs at Once
 
-Send questions to multiple AI services from a single input field. Compare responses from ChatGPT, Gemini, Claude, and Perplexity at a glance.
+Send questions to multiple AI services from a single input field. Compare responses from ChatGPT, Gemini, Claude, Perplexity, and Mistral AI at a glance.
 
 ### Flexible Layouts
 
