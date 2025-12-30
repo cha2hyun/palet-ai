@@ -5,6 +5,7 @@ export interface EnabledServices {
   gemini: boolean;
   perplexity: boolean;
   claude: boolean;
+  mistral: boolean;
   browser: boolean;
 }
 
@@ -51,6 +52,7 @@ export function isValidEnabledServices(value: unknown): value is EnabledServices
     typeof (value as EnabledServices).gemini === 'boolean' &&
     typeof (value as EnabledServices).perplexity === 'boolean' &&
     typeof (value as EnabledServices).claude === 'boolean' &&
+    typeof (value as EnabledServices).mistral === 'boolean' &&
     typeof (value as EnabledServices).browser === 'boolean'
   );
 }
@@ -69,6 +71,7 @@ export interface LastUrls {
   gemini: string;
   perplexity: string;
   claude: string;
+  mistral: string;
 }
 
 export function isValidLastUrls(value: unknown): value is LastUrls {
@@ -78,6 +81,7 @@ export function isValidLastUrls(value: unknown): value is LastUrls {
     typeof (value as LastUrls).chatgpt === 'string' &&
     typeof (value as LastUrls).gemini === 'string' &&
     typeof (value as LastUrls).perplexity === 'string' &&
-    typeof (value as LastUrls).claude === 'string'
+    typeof (value as LastUrls).claude === 'string' &&
+    typeof (value as LastUrls).mistral === 'string'
   );
 }

@@ -44,6 +44,15 @@ export const AI_SERVICES: Record<string, AIServiceConfig> = {
     selector: 'div[contenteditable="true"][role="textbox"][data-testid="chat-input"]',
     buttonSelector: 'button[aria-label="메시지 보내기"], button[aria-label*="Send"]',
     color: 'orange'
+  },
+  mistral: {
+    name: 'mistral',
+    displayName: 'Mistral',
+    url: 'https://chat.mistral.ai/',
+    partition: 'persist:mistral',
+    selector: 'div.ProseMirror[contenteditable="true"]',
+    buttonSelector: 'button[type="submit"][aria-label="Send question"], button[type="submit"]',
+    color: 'red'
   }
 };
 

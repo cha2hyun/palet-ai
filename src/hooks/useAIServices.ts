@@ -1,10 +1,10 @@
-import { useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { WebviewElement } from './useWebviewManager';
 
 // 개발 모드 체크
 const isDev = import.meta.env.DEV;
 
-export function useAIServices() {
+export default function useAIServices() {
   const sendToAI = useCallback(
     async (
       webviewRef: React.RefObject<WebviewElement>,

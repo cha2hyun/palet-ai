@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { Chip } from '@heroui/react';
 import AppBar from './AppBar';
 import ServiceSelector from './components/ServiceSelector';
 import LayoutSelector from './components/LayoutSelector';
@@ -17,7 +18,7 @@ import {
   type LastUrls
 } from './hooks/useLocalStorage';
 import { useWebviewManager } from './hooks/useWebviewManager';
-import { useAIServices } from './hooks/useAIServices';
+import useAIServices from './hooks/useAIServices';
 import useBrowser from './hooks/useBrowser';
 import { useReleaseChecker } from './hooks/useReleaseChecker';
 
@@ -30,17 +31,17 @@ function App() {
 
   // Zoom 레벨 복원 및 저장
   useEffect(() => {
-    if (!window.Main) return;
+    if (!window.Main) return undefined;
 
-    // 저장된 zoom 레벨 복원 (없으면 기본값 -1 사용)
+    // 저장된 zoom 레벨 복원 (없으면 기본값 0 사용)
     const savedZoomLevel = localStorage.getItem('zoomLevel');
     if (savedZoomLevel) {
       const zoomLevel = parseFloat(savedZoomLevel);
       window.Main.RestoreZoomLevel(zoomLevel);
     } else {
-      // 최초 실행 시 기본값 -1로 설정 (1단계 축소)
-      localStorage.setItem('zoomLevel', '-1');
-      window.Main.RestoreZoomLevel(-1);
+      // 최초 실행 시 기본값 0으로 설정 (정상 크기)
+      localStorage.setItem('zoomLevel', '0');
+      window.Main.RestoreZoomLevel(0);
     }
 
     // zoom 레벨 변경 이벤트 리스너
@@ -61,11 +62,19 @@ function App() {
   // localStorage 연동 상태
   const [enabledServices, setEnabledServices] = useLocalStorage<EnabledServices>(
     'enabledServices',
-    { chatgpt: true, gemini: true, perplexity: true, claude: true, browser: false },
+    { chatgpt: true, gemini: true, perplexity: true, claude: true, mistral: true, browser: false },
     isValidEnabledServices
   );
 
-  const [layoutType, setLayoutType] = useLocalStorage<LayoutType>('layoutType', 'column', isValidLayoutType);
+  const [layoutType, setLayoutType] = useLocalStorage<LayoutType>('layoutType', 'row', isValidLayoutType);
+
+  // Grid 레이아웃 제약 조건 체크 (5개 이상 선택 시 자동으로 Row로 전환)
+  useEffect(() => {
+    const selectedCount = Object.values(enabledServices).filter(Boolean).length;
+    if (layoutType === 'grid' && selectedCount > 4) {
+      setLayoutType('row');
+    }
+  }, [enabledServices, layoutType, setLayoutType]);
 
   // 마지막 채팅 URL 저장
   const [lastUrls, setLastUrls] = useLocalStorage<LastUrls>(
@@ -74,14 +83,15 @@ function App() {
       chatgpt: AI_SERVICES.chatgpt.url,
       gemini: AI_SERVICES.gemini.url,
       perplexity: AI_SERVICES.perplexity.url,
-      claude: AI_SERVICES.claude.url
+      claude: AI_SERVICES.claude.url,
+      mistral: AI_SERVICES.mistral.url
     },
     isValidLastUrls
   );
 
   // Webview 관리
   const { refs, webviewsReady } = useWebviewManager();
-  const { chatgptRef, geminiRef, perplexityRef, claudeRef, browserRef } = refs;
+  const { chatgptRef, geminiRef, perplexityRef, claudeRef, mistralRef, browserRef } = refs;
 
   // AI 서비스 관리
   const { sendToAI, searchInBrowser } = useAIServices();
@@ -114,7 +124,8 @@ function App() {
       chatgpt: AI_SERVICES.chatgpt.url,
       gemini: AI_SERVICES.gemini.url,
       perplexity: AI_SERVICES.perplexity.url,
-      claude: AI_SERVICES.claude.url
+      claude: AI_SERVICES.claude.url,
+      mistral: AI_SERVICES.mistral.url
     };
 
     // localStorage 업데이트
@@ -137,7 +148,11 @@ function App() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (claudeRef.current as any).loadURL(AI_SERVICES.claude.url);
     }
-  }, [setLastUrls, chatgptRef, geminiRef, perplexityRef, claudeRef]);
+    if (mistralRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mistralRef.current as any).loadURL(AI_SERVICES.mistral.url);
+    }
+  }, [setLastUrls, chatgptRef, geminiRef, perplexityRef, claudeRef, mistralRef]);
 
   // 모든 AI 서비스에 전송
   const handleSendToAll = useCallback(async () => {
@@ -147,58 +162,72 @@ function App() {
 
     setIsSending(true);
 
-    // ChatGPT에 전송
-    if (enabledServices.chatgpt && webviewsReady.chatgpt) {
-      await sendToAI(
-        chatgptRef,
-        AI_SERVICES.chatgpt.selector,
-        AI_SERVICES.chatgpt.buttonSelector,
-        prompt,
-        AI_SERVICES.chatgpt.displayName
-      );
-    }
+    try {
+      // ChatGPT에 전송
+      if (enabledServices.chatgpt && webviewsReady.chatgpt) {
+        await sendToAI(
+          chatgptRef,
+          AI_SERVICES.chatgpt.selector,
+          AI_SERVICES.chatgpt.buttonSelector,
+          prompt,
+          AI_SERVICES.chatgpt.displayName
+        );
+      }
 
-    // Gemini에 전송
-    if (enabledServices.gemini && webviewsReady.gemini) {
-      await sendToAI(
-        geminiRef,
-        AI_SERVICES.gemini.selector,
-        AI_SERVICES.gemini.buttonSelector,
-        prompt,
-        AI_SERVICES.gemini.displayName
-      );
-    }
+      // Gemini에 전송
+      if (enabledServices.gemini && webviewsReady.gemini) {
+        await sendToAI(
+          geminiRef,
+          AI_SERVICES.gemini.selector,
+          AI_SERVICES.gemini.buttonSelector,
+          prompt,
+          AI_SERVICES.gemini.displayName
+        );
+      }
 
-    // Perplexity에 전송
-    if (enabledServices.perplexity && webviewsReady.perplexity) {
-      await sendToAI(
-        perplexityRef,
-        AI_SERVICES.perplexity.selector,
-        AI_SERVICES.perplexity.buttonSelector,
-        prompt,
-        AI_SERVICES.perplexity.displayName
-      );
-    }
+      // Perplexity에 전송
+      if (enabledServices.perplexity && webviewsReady.perplexity) {
+        await sendToAI(
+          perplexityRef,
+          AI_SERVICES.perplexity.selector,
+          AI_SERVICES.perplexity.buttonSelector,
+          prompt,
+          AI_SERVICES.perplexity.displayName
+        );
+      }
 
-    // Claude에 전송
-    if (enabledServices.claude && webviewsReady.claude) {
-      await sendToAI(
-        claudeRef,
-        AI_SERVICES.claude.selector,
-        AI_SERVICES.claude.buttonSelector,
-        prompt,
-        AI_SERVICES.claude.displayName
-      );
-    }
+      // Claude에 전송
+      if (enabledServices.claude && webviewsReady.claude) {
+        await sendToAI(
+          claudeRef,
+          AI_SERVICES.claude.selector,
+          AI_SERVICES.claude.buttonSelector,
+          prompt,
+          AI_SERVICES.claude.displayName
+        );
+      }
 
-    // Browser에 전송
-    if (enabledServices.browser && webviewsReady.browser) {
-      await searchInBrowser(browserRef, prompt);
-    }
+      // Mistral에 전송
+      if (enabledServices.mistral && webviewsReady.mistral) {
+        await sendToAI(
+          mistralRef,
+          AI_SERVICES.mistral.selector,
+          AI_SERVICES.mistral.buttonSelector,
+          prompt,
+          AI_SERVICES.mistral.displayName
+        );
+      }
 
-    setTimeout(() => {
-      setIsSending(false);
-    }, 1000);
+      // Browser에 전송
+      if (enabledServices.browser && webviewsReady.browser) {
+        await searchInBrowser(browserRef, prompt);
+      }
+    } finally {
+      // 모든 작업 완료 후 1초 뒤 isSending을 false로 설정
+      setTimeout(() => {
+        setIsSending(false);
+      }, 1000);
+    }
   }, [
     prompt,
     enabledServices,
@@ -209,6 +238,7 @@ function App() {
     geminiRef,
     perplexityRef,
     claudeRef,
+    mistralRef,
     browserRef
   ]);
 
@@ -259,6 +289,15 @@ function App() {
           onUrlChange={handleUrlChange}
         />
 
+        {/* Mistral */}
+        <WebviewPanel
+          service={AI_SERVICES.mistral}
+          webviewRef={mistralRef as unknown as React.RefObject<HTMLElement>}
+          isVisible={enabledServices.mistral}
+          lastUrl={lastUrls.mistral}
+          onUrlChange={handleUrlChange}
+        />
+
         {/* Web Browser */}
         <BrowserPanel
           browserRef={browserRef as unknown as React.RefObject<HTMLElement>}
@@ -274,18 +313,52 @@ function App() {
       {/* 입력창 영역 (하단) */}
       <div className="flex-none px-6 py-4 border-t border-gray-900 bg-gray-950/50">
         <div className="max-w-full mx-auto space-y-2">
-          {/* 상단 컨트롤 영역 */}
-          <div className="flex items-center gap-4">
+          {/* 컨트롤 영역 - 반응형 (한 줄 → 여러 줄로 자동 줄바꿈) */}
+          <div className="flex items-center gap-4 flex-wrap">
             {/* New Chat 버튼 - 맨 좌측 */}
             <button
               onClick={handleNewChat}
               className="h-10 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 backdrop-blur-sm rounded-lg border border-blue-500/50 hover:border-blue-500 transition-all duration-200"
             >
-              <span className="text-sm font-medium text-blue-400">New Chat</span>
+              <span className="text-sm font-medium text-blue-400">⚡️ New Chat</span>
             </button>
 
-            <ServiceSelector enabledServices={enabledServices} setEnabledServices={setEnabledServices} />
-            <LayoutSelector layoutType={layoutType} setLayoutType={setLayoutType} />
+            <ServiceSelector
+              enabledServices={enabledServices}
+              setEnabledServices={setEnabledServices}
+              layoutType={layoutType}
+            />
+            <LayoutSelector layoutType={layoutType} setLayoutType={setLayoutType} enabledServices={enabledServices} />
+
+            {/* Zoom 컨트롤 */}
+            {window.Main && (
+              <div className="h-10 flex items-center gap-3 py-2 px-4 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
+                <Chip size="md" variant="flat" className="text-gray-500 bg-transparent">
+                  Zoom
+                </Chip>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => window.Main.ZoomOut()}
+                    className="p-1.5 hover:bg-gray-800 rounded transition-colors"
+                    title="축소 (Cmd -)"
+                  >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </button>
+
+                  <button
+                    onClick={() => window.Main.ZoomIn()}
+                    className="p-1.5 hover:bg-gray-800 rounded transition-colors"
+                    title="확대 (Cmd +)"
+                  >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* 개발 모드에서만 표시 */}
             {import.meta.env.DEV && (
@@ -294,15 +367,14 @@ function App() {
                 geminiRef={geminiRef}
                 perplexityRef={perplexityRef}
                 claudeRef={claudeRef}
+                mistralRef={mistralRef}
               />
             )}
 
             {/* GitHub 바로가기 */}
-            <a
-              href="https://github.com/cha2hyun/PaletAI"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 h-10 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800 hover:border-gray-700 transition-colors"
+            <button
+              onClick={() => window.Main?.OpenExternalLink('https://github.com/cha2hyun/PaletAI')}
+              className="flex items-center gap-2 h-10 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800 hover:border-gray-700 transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -312,15 +384,13 @@ function App() {
                 />
               </svg>
               <span className="text-xs font-medium text-gray-400">GitHub</span>
-            </a>
+            </button>
 
             {/* 새 릴리즈 알림 */}
             {releaseInfo && releaseInfo.hasNewVersion && (
-              <a
-                href={releaseInfo.releaseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 h-10 px-4 py-2 bg-green-500/20 backdrop-blur-sm rounded-lg border border-green-500/50 hover:border-green-500 transition-colors animate-pulse"
+              <button
+                onClick={() => window.Main?.OpenExternalLink(releaseInfo.releaseUrl)}
+                className="flex items-center gap-2 h-10 px-4 py-2 bg-green-500/20 backdrop-blur-sm rounded-lg border border-green-500/50 hover:border-green-500 transition-colors animate-pulse cursor-pointer"
                 title={`새 버전 ${releaseInfo.latestVersion} 사용 가능`}
               >
                 <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,32 +402,7 @@ function App() {
                   />
                 </svg>
                 <span className="text-xs font-medium text-green-400">v{releaseInfo.latestVersion}</span>
-              </a>
-            )}
-
-            {/* Zoom 컨트롤 */}
-            {window.Main && (
-              <div className="flex items-center gap-1 h-10 px-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
-                <button
-                  onClick={() => window.Main.ZoomOut()}
-                  className="p-2 hover:bg-gray-800 rounded transition-colors"
-                  title="축소 (Cmd -)"
-                >
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                  </svg>
-                </button>
-
-                <button
-                  onClick={() => window.Main.ZoomIn()}
-                  className="p-2 hover:bg-gray-800 rounded transition-colors"
-                  title="확대 (Cmd +)"
-                >
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-              </div>
+              </button>
             )}
           </div>
 
