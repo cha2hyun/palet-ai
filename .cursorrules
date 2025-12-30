@@ -247,11 +247,21 @@ export const AI_SERVICES: Record<string, AIServiceConfig> = {
 ### When Updating Version:
 
 1. **package.json**: Update `version` field
+   - This is the ONLY file you need to update for version number
+   - `src/hooks/useReleaseChecker.ts` automatically reads from `package.json`
+   - No need to manually update version constants elsewhere
 2. **CHANGELOG.md**: Add new version section at the top
 3. **README.md**: Update version badge
 4. Commit changes to `main` branch
 5. **DO NOT** manually push to `deploy` branch
 6. GitHub Actions will handle the release automatically
+
+### Version Auto-Sync
+
+**Important**: The app version is automatically synced from `package.json`:
+- `src/hooks/useReleaseChecker.ts` imports version from `package.json`
+- You only need to update the version in ONE place: `package.json`
+- Never hardcode version numbers in source files
 
 ---
 
