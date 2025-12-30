@@ -26,8 +26,8 @@ jobs:
         id: changelog
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          # Extract changelog section for current version
-          CHANGELOG=$(awk "/## \[$VERSION\]/,/^## \[/ {if (/^## \[$VERSION\]/) {print; next} if (/^## \[/) exit; print}" CHANGELOG.md || echo "No changelog found for this version.")
+          # Extract changelog section for current version (skip the version header, get content until --- or next version)
+          CHANGELOG=$(awk "/## \[$VERSION\]/,/^---$|^## \[/ {if (/^## \[$VERSION\]/) next; if (/^---$/ || /^## \[/) exit; print}" CHANGELOG.md | sed -e :a -e '/^\n*$/{ $d; N; ba' -e '}' || echo "No changelog found for this version.")
           # Save to file to preserve formatting
           echo "$CHANGELOG" > /tmp/current_changelog.md
           # Set output (truncated for GitHub Actions)
