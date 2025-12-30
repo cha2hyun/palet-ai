@@ -1,23 +1,21 @@
 import React, { useMemo } from 'react';
 import { Checkbox, Chip, Tooltip } from '@heroui/react';
-import { EnabledServices } from '../hooks/useLocalStorage';
+import { EnabledServices, LayoutType } from '../hooks/useLocalStorage';
 
 interface ServiceSelectorProps {
   enabledServices: EnabledServices;
   setEnabledServices: (services: EnabledServices) => void;
+  layoutType: LayoutType;
 }
 
-const MAX_SELECTIONS = 5;
-
-export default function ServiceSelector({ enabledServices, setEnabledServices }: ServiceSelectorProps) {
+export default function ServiceSelector({ enabledServices, setEnabledServices, layoutType }: ServiceSelectorProps) {
   // 현재 선택된 서비스 개수 계산
   const selectedCount = useMemo(() => {
     return Object.values(enabledServices).filter(Boolean).length;
   }, [enabledServices]);
 
-  // 최대 선택 개수 도달 여부
-  const isMaxReached = selectedCount >= MAX_SELECTIONS;
-
+  // Grid 레이아웃이고 4개가 선택된 경우, 선택되지 않은 항목 비활성화
+  const isMaxReachedInGrid = layoutType === 'grid' && selectedCount >= 4;
   return (
     <div className="h-10 flex items-center gap-3 py-2 px-4 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
       <Chip size="md" variant="flat" className="text-gray-500 bg-transparent">
@@ -25,8 +23,8 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Chip>
 
       <Tooltip
-        content="Maximum 5 selections allowed"
-        isDisabled={enabledServices.chatgpt || !isMaxReached}
+        content="Grid layout supports up to 4 selections"
+        isDisabled={enabledServices.chatgpt || !isMaxReachedInGrid}
         placement="top"
         showArrow
         delay={0}
@@ -39,7 +37,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
           <Checkbox
             isSelected={enabledServices.chatgpt}
             onValueChange={(checked) => setEnabledServices({ ...enabledServices, chatgpt: checked })}
-            isDisabled={!enabledServices.chatgpt && isMaxReached}
+            isDisabled={!enabledServices.chatgpt && isMaxReachedInGrid}
             size="sm"
             classNames={{
               wrapper: 'w-4 h-4',
@@ -52,8 +50,8 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 5 selections allowed"
-        isDisabled={enabledServices.gemini || !isMaxReached}
+        content="Grid layout supports up to 4 selections"
+        isDisabled={enabledServices.gemini || !isMaxReachedInGrid}
         placement="top"
         showArrow
         delay={0}
@@ -66,7 +64,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
           <Checkbox
             isSelected={enabledServices.gemini}
             onValueChange={(checked) => setEnabledServices({ ...enabledServices, gemini: checked })}
-            isDisabled={!enabledServices.gemini && isMaxReached}
+            isDisabled={!enabledServices.gemini && isMaxReachedInGrid}
             size="sm"
             classNames={{
               wrapper: 'w-4 h-4',
@@ -79,8 +77,8 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 5 selections allowed"
-        isDisabled={enabledServices.perplexity || !isMaxReached}
+        content="Grid layout supports up to 4 selections"
+        isDisabled={enabledServices.perplexity || !isMaxReachedInGrid}
         placement="top"
         showArrow
         delay={0}
@@ -93,7 +91,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
           <Checkbox
             isSelected={enabledServices.perplexity}
             onValueChange={(checked) => setEnabledServices({ ...enabledServices, perplexity: checked })}
-            isDisabled={!enabledServices.perplexity && isMaxReached}
+            isDisabled={!enabledServices.perplexity && isMaxReachedInGrid}
             size="sm"
             classNames={{
               wrapper: 'w-4 h-4',
@@ -106,8 +104,8 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 5 selections allowed"
-        isDisabled={enabledServices.claude || !isMaxReached}
+        content="Grid layout supports up to 4 selections"
+        isDisabled={enabledServices.claude || !isMaxReachedInGrid}
         placement="top"
         showArrow
         delay={0}
@@ -120,7 +118,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
           <Checkbox
             isSelected={enabledServices.claude}
             onValueChange={(checked) => setEnabledServices({ ...enabledServices, claude: checked })}
-            isDisabled={!enabledServices.claude && isMaxReached}
+            isDisabled={!enabledServices.claude && isMaxReachedInGrid}
             size="sm"
             classNames={{
               wrapper: 'w-4 h-4',
@@ -133,8 +131,8 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 5 selections allowed"
-        isDisabled={enabledServices.mistral || !isMaxReached}
+        content="Grid layout supports up to 4 selections"
+        isDisabled={enabledServices.mistral || !isMaxReachedInGrid}
         placement="top"
         showArrow
         delay={0}
@@ -147,7 +145,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
           <Checkbox
             isSelected={enabledServices.mistral}
             onValueChange={(checked) => setEnabledServices({ ...enabledServices, mistral: checked })}
-            isDisabled={!enabledServices.mistral && isMaxReached}
+            isDisabled={!enabledServices.mistral && isMaxReachedInGrid}
             size="sm"
             classNames={{
               wrapper: 'w-4 h-4',
@@ -160,8 +158,8 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 5 selections allowed"
-        isDisabled={enabledServices.browser || !isMaxReached}
+        content="Grid layout supports up to 4 selections"
+        isDisabled={enabledServices.browser || !isMaxReachedInGrid}
         placement="top"
         showArrow
         delay={0}
@@ -174,7 +172,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
           <Checkbox
             isSelected={enabledServices.browser}
             onValueChange={(checked) => setEnabledServices({ ...enabledServices, browser: checked })}
-            isDisabled={!enabledServices.browser && isMaxReached}
+            isDisabled={!enabledServices.browser && isMaxReachedInGrid}
             size="sm"
             classNames={{
               wrapper: 'w-4 h-4',

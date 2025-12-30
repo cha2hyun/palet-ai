@@ -17,7 +17,7 @@ import {
   type LastUrls
 } from './hooks/useLocalStorage';
 import { useWebviewManager } from './hooks/useWebviewManager';
-import { useAIServices } from './hooks/useAIServices';
+import useAIServices from './hooks/useAIServices';
 import useBrowser from './hooks/useBrowser';
 import { useReleaseChecker } from './hooks/useReleaseChecker';
 
@@ -30,17 +30,17 @@ function App() {
 
   // Zoom 레벨 복원 및 저장
   useEffect(() => {
-    if (!window.Main) return;
+    if (!window.Main) return undefined;
 
-    // 저장된 zoom 레벨 복원 (없으면 기본값 -1 사용)
+    // 저장된 zoom 레벨 복원 (없으면 기본값 0 사용)
     const savedZoomLevel = localStorage.getItem('zoomLevel');
     if (savedZoomLevel) {
       const zoomLevel = parseFloat(savedZoomLevel);
       window.Main.RestoreZoomLevel(zoomLevel);
     } else {
-      // 최초 실행 시 기본값 -1로 설정 (1단계 축소)
-      localStorage.setItem('zoomLevel', '-1');
-      window.Main.RestoreZoomLevel(-1);
+      // 최초 실행 시 기본값 0으로 설정 (정상 크기)
+      localStorage.setItem('zoomLevel', '0');
+      window.Main.RestoreZoomLevel(0);
     }
 
     // zoom 레벨 변경 이벤트 리스너
@@ -65,7 +65,7 @@ function App() {
     isValidEnabledServices
   );
 
-  const [layoutType, setLayoutType] = useLocalStorage<LayoutType>('layoutType', 'column', isValidLayoutType);
+  const [layoutType, setLayoutType] = useLocalStorage<LayoutType>('layoutType', 'row', isValidLayoutType);
 
   // 마지막 채팅 URL 저장
   const [lastUrls, setLastUrls] = useLocalStorage<LastUrls>(
@@ -215,7 +215,7 @@ function App() {
 
     setTimeout(() => {
       setIsSending(false);
-    }, 1000);
+    }, 300);
   }, [
     prompt,
     enabledServices,
@@ -311,8 +311,12 @@ function App() {
               <span className="text-sm font-medium text-blue-400">New Chat</span>
             </button>
 
-            <ServiceSelector enabledServices={enabledServices} setEnabledServices={setEnabledServices} />
-            <LayoutSelector layoutType={layoutType} setLayoutType={setLayoutType} />
+            <ServiceSelector
+              enabledServices={enabledServices}
+              setEnabledServices={setEnabledServices}
+              layoutType={layoutType}
+            />
+            <LayoutSelector layoutType={layoutType} setLayoutType={setLayoutType} enabledServices={enabledServices} />
 
             {/* 개발 모드에서만 표시 */}
             {import.meta.env.DEV && (
