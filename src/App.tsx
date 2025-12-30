@@ -162,69 +162,72 @@ function App() {
 
     setIsSending(true);
 
-    // ChatGPT에 전송
-    if (enabledServices.chatgpt && webviewsReady.chatgpt) {
-      await sendToAI(
-        chatgptRef,
-        AI_SERVICES.chatgpt.selector,
-        AI_SERVICES.chatgpt.buttonSelector,
-        prompt,
-        AI_SERVICES.chatgpt.displayName
-      );
-    }
+    try {
+      // ChatGPT에 전송
+      if (enabledServices.chatgpt && webviewsReady.chatgpt) {
+        await sendToAI(
+          chatgptRef,
+          AI_SERVICES.chatgpt.selector,
+          AI_SERVICES.chatgpt.buttonSelector,
+          prompt,
+          AI_SERVICES.chatgpt.displayName
+        );
+      }
 
-    // Gemini에 전송
-    if (enabledServices.gemini && webviewsReady.gemini) {
-      await sendToAI(
-        geminiRef,
-        AI_SERVICES.gemini.selector,
-        AI_SERVICES.gemini.buttonSelector,
-        prompt,
-        AI_SERVICES.gemini.displayName
-      );
-    }
+      // Gemini에 전송
+      if (enabledServices.gemini && webviewsReady.gemini) {
+        await sendToAI(
+          geminiRef,
+          AI_SERVICES.gemini.selector,
+          AI_SERVICES.gemini.buttonSelector,
+          prompt,
+          AI_SERVICES.gemini.displayName
+        );
+      }
 
-    // Perplexity에 전송
-    if (enabledServices.perplexity && webviewsReady.perplexity) {
-      await sendToAI(
-        perplexityRef,
-        AI_SERVICES.perplexity.selector,
-        AI_SERVICES.perplexity.buttonSelector,
-        prompt,
-        AI_SERVICES.perplexity.displayName
-      );
-    }
+      // Perplexity에 전송
+      if (enabledServices.perplexity && webviewsReady.perplexity) {
+        await sendToAI(
+          perplexityRef,
+          AI_SERVICES.perplexity.selector,
+          AI_SERVICES.perplexity.buttonSelector,
+          prompt,
+          AI_SERVICES.perplexity.displayName
+        );
+      }
 
-    // Claude에 전송
-    if (enabledServices.claude && webviewsReady.claude) {
-      await sendToAI(
-        claudeRef,
-        AI_SERVICES.claude.selector,
-        AI_SERVICES.claude.buttonSelector,
-        prompt,
-        AI_SERVICES.claude.displayName
-      );
-    }
+      // Claude에 전송
+      if (enabledServices.claude && webviewsReady.claude) {
+        await sendToAI(
+          claudeRef,
+          AI_SERVICES.claude.selector,
+          AI_SERVICES.claude.buttonSelector,
+          prompt,
+          AI_SERVICES.claude.displayName
+        );
+      }
 
-    // Mistral에 전송
-    if (enabledServices.mistral && webviewsReady.mistral) {
-      await sendToAI(
-        mistralRef,
-        AI_SERVICES.mistral.selector,
-        AI_SERVICES.mistral.buttonSelector,
-        prompt,
-        AI_SERVICES.mistral.displayName
-      );
-    }
+      // Mistral에 전송
+      if (enabledServices.mistral && webviewsReady.mistral) {
+        await sendToAI(
+          mistralRef,
+          AI_SERVICES.mistral.selector,
+          AI_SERVICES.mistral.buttonSelector,
+          prompt,
+          AI_SERVICES.mistral.displayName
+        );
+      }
 
-    // Browser에 전송
-    if (enabledServices.browser && webviewsReady.browser) {
-      await searchInBrowser(browserRef, prompt);
+      // Browser에 전송
+      if (enabledServices.browser && webviewsReady.browser) {
+        await searchInBrowser(browserRef, prompt);
+      }
+    } finally {
+      // 모든 작업 완료 후 1초 뒤 isSending을 false로 설정
+      setTimeout(() => {
+        setIsSending(false);
+      }, 1000);
     }
-
-    setTimeout(() => {
-      setIsSending(false);
-    }, 300);
   }, [
     prompt,
     enabledServices,

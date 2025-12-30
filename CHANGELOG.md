@@ -42,10 +42,7 @@ All notable changes to Palet AI will be documented in this file.
 - Fixed useEffect return type warning
 - Fixed React import for useAIServices hook
 - Improved localStorage validation for new services
-
-### 🔄 Performance
-
-- Reduced message sending completion timeout from 1000ms to 300ms for faster UI feedback
+- Added try-finally block to ensure isSending state is properly reset even on errors
 
 ---
 
