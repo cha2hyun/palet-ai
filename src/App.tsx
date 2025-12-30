@@ -317,7 +317,7 @@ function App() {
               onClick={handleNewChat}
               className="h-10 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 backdrop-blur-sm rounded-lg border border-blue-500/50 hover:border-blue-500 transition-all duration-200"
             >
-              <span className="text-sm font-medium text-blue-400">New Chat</span>
+              <span className="text-sm font-medium text-blue-400">⚡️ New Chat</span>
             </button>
 
             <ServiceSelector
