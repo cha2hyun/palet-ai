@@ -2,7 +2,7 @@
 import { join } from 'path';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent, nativeTheme, nativeImage } from 'electron';
+import { BrowserWindow, app, ipcMain, IpcMainEvent, nativeTheme, nativeImage, shell } from 'electron';
 
 // 개발 모드 체크 (electron-is-dev 대신 내장 기능 사용)
 const isDev = !app.isPackaged;
@@ -135,6 +135,13 @@ function createWindow() {
     if (mainWindow && typeof savedZoomLevel === 'number') {
       zoomLevel = clampZoomLevel(savedZoomLevel);
       mainWindow.webContents.setZoomFactor(1 + zoomLevel);
+    }
+  });
+
+  // 외부 링크를 기본 브라우저로 열기
+  ipcMain.on('open-external-link', (_event, url: string) => {
+    if (url && typeof url === 'string') {
+      shell.openExternal(url);
     }
   });
 

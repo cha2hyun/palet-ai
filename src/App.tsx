@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { Chip } from '@heroui/react';
 import AppBar from './AppBar';
 import ServiceSelector from './components/ServiceSelector';
 import LayoutSelector from './components/LayoutSelector';
@@ -66,6 +67,14 @@ function App() {
   );
 
   const [layoutType, setLayoutType] = useLocalStorage<LayoutType>('layoutType', 'row', isValidLayoutType);
+
+  // Grid 레이아웃 제약 조건 체크 (5개 이상 선택 시 자동으로 Row로 전환)
+  useEffect(() => {
+    const selectedCount = Object.values(enabledServices).filter(Boolean).length;
+    if (layoutType === 'grid' && selectedCount > 4) {
+      setLayoutType('row');
+    }
+  }, [enabledServices, layoutType, setLayoutType]);
 
   // 마지막 채팅 URL 저장
   const [lastUrls, setLastUrls] = useLocalStorage<LastUrls>(
@@ -301,8 +310,8 @@ function App() {
       {/* 입력창 영역 (하단) */}
       <div className="flex-none px-6 py-4 border-t border-gray-900 bg-gray-950/50">
         <div className="max-w-full mx-auto space-y-2">
-          {/* 상단 컨트롤 영역 */}
-          <div className="flex items-center gap-4">
+          {/* 컨트롤 영역 - 반응형 (한 줄 → 여러 줄로 자동 줄바꿈) */}
+          <div className="flex items-center gap-4 flex-wrap">
             {/* New Chat 버튼 - 맨 좌측 */}
             <button
               onClick={handleNewChat}
@@ -318,6 +327,36 @@ function App() {
             />
             <LayoutSelector layoutType={layoutType} setLayoutType={setLayoutType} enabledServices={enabledServices} />
 
+            {/* Zoom 컨트롤 */}
+            {window.Main && (
+              <div className="h-10 flex items-center gap-3 py-2 px-4 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
+                <Chip size="md" variant="flat" className="text-gray-500 bg-transparent">
+                  Zoom
+                </Chip>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => window.Main.ZoomOut()}
+                    className="p-1.5 hover:bg-gray-800 rounded transition-colors"
+                    title="축소 (Cmd -)"
+                  >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                    </svg>
+                  </button>
+
+                  <button
+                    onClick={() => window.Main.ZoomIn()}
+                    className="p-1.5 hover:bg-gray-800 rounded transition-colors"
+                    title="확대 (Cmd +)"
+                  >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 개발 모드에서만 표시 */}
             {import.meta.env.DEV && (
               <DeveloperTools
@@ -330,11 +369,9 @@ function App() {
             )}
 
             {/* GitHub 바로가기 */}
-            <a
-              href="https://github.com/cha2hyun/PaletAI"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 h-10 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800 hover:border-gray-700 transition-colors"
+            <button
+              onClick={() => window.Main?.OpenExternalLink('https://github.com/cha2hyun/PaletAI')}
+              className="flex items-center gap-2 h-10 px-4 py-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800 hover:border-gray-700 transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -344,15 +381,13 @@ function App() {
                 />
               </svg>
               <span className="text-xs font-medium text-gray-400">GitHub</span>
-            </a>
+            </button>
 
             {/* 새 릴리즈 알림 */}
             {releaseInfo && releaseInfo.hasNewVersion && (
-              <a
-                href={releaseInfo.releaseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 h-10 px-4 py-2 bg-green-500/20 backdrop-blur-sm rounded-lg border border-green-500/50 hover:border-green-500 transition-colors animate-pulse"
+              <button
+                onClick={() => window.Main?.OpenExternalLink(releaseInfo.releaseUrl)}
+                className="flex items-center gap-2 h-10 px-4 py-2 bg-green-500/20 backdrop-blur-sm rounded-lg border border-green-500/50 hover:border-green-500 transition-colors animate-pulse cursor-pointer"
                 title={`새 버전 ${releaseInfo.latestVersion} 사용 가능`}
               >
                 <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,32 +399,7 @@ function App() {
                   />
                 </svg>
                 <span className="text-xs font-medium text-green-400">v{releaseInfo.latestVersion}</span>
-              </a>
-            )}
-
-            {/* Zoom 컨트롤 */}
-            {window.Main && (
-              <div className="flex items-center gap-1 h-10 px-2 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
-                <button
-                  onClick={() => window.Main.ZoomOut()}
-                  className="p-2 hover:bg-gray-800 rounded transition-colors"
-                  title="축소 (Cmd -)"
-                >
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                  </svg>
-                </button>
-
-                <button
-                  onClick={() => window.Main.ZoomIn()}
-                  className="p-2 hover:bg-gray-800 rounded transition-colors"
-                  title="확대 (Cmd +)"
-                >
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-              </div>
+              </button>
             )}
           </div>
 

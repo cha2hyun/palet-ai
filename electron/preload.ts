@@ -182,6 +182,9 @@ const api = {
   RestoreZoomLevel: (zoomLevel: number) => {
     ipcRenderer.send('restore-zoom-level', zoomLevel);
   },
+  OpenExternalLink: (url: string) => {
+    ipcRenderer.send('open-external-link', url);
+  },
   removeLoading: () => {
     removeLoading();
   },

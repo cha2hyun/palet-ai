@@ -19,7 +19,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices, l
   return (
     <div className="h-10 flex items-center gap-3 py-2 px-4 bg-black/30 backdrop-blur-sm rounded-lg border border-gray-800">
       <Chip size="md" variant="flat" className="text-gray-500 bg-transparent">
-        Target:
+        Target
       </Chip>
 
       <Tooltip
