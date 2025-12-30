@@ -49,6 +49,7 @@ All notable changes to Palet AI will be documented in this file.
 ## [1.0.6] - Previous Release
 
 ### Features
+
 - Zoom level persistence
 - Window zoom shortcuts (Cmd +/-)
 - Multiple AI services support
@@ -58,10 +59,10 @@ All notable changes to Palet AI will be documented in this file.
 ## Installation
 
 **macOS (Apple Silicon):**
+
 ```bash
 brew install --cask cha2hyun/tap/palet-ai
 ```
 
 **Windows:**
 Download and run `Palet-AI-Setup.exe`
-
