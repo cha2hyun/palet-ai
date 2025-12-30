@@ -6,9 +6,10 @@ interface DeveloperToolsProps {
   geminiRef: React.RefObject<WebviewElement>;
   perplexityRef: React.RefObject<WebviewElement>;
   claudeRef: React.RefObject<WebviewElement>;
+  mistralRef: React.RefObject<WebviewElement>;
 }
 
-export default function DeveloperTools({ chatgptRef, geminiRef, perplexityRef, claudeRef }: DeveloperToolsProps) {
+export default function DeveloperTools({ chatgptRef, geminiRef, perplexityRef, claudeRef, mistralRef }: DeveloperToolsProps) {
   const openDevTools = useCallback((webviewRef: React.RefObject<WebviewElement>) => {
     if (webviewRef.current) {
       webviewRef.current.openDevTools();
@@ -149,6 +150,12 @@ export default function DeveloperTools({ chatgptRef, geminiRef, perplexityRef, c
             >
               Claude
             </button>
+            <button
+              onClick={() => openDevTools(mistralRef)}
+              className="px-2 py-0.5 text-xs bg-gray-800/50 text-gray-400 rounded hover:bg-gray-700/50 hover:text-gray-300 transition-all whitespace-nowrap"
+            >
+              Mistral
+            </button>
           </div>
 
           <div className="h-4 w-px bg-gray-800" />
@@ -177,6 +184,12 @@ export default function DeveloperTools({ chatgptRef, geminiRef, perplexityRef, c
               className="px-2 py-0.5 text-xs bg-gray-800/30 text-gray-400 rounded hover:bg-gray-700/40 hover:text-gray-300 transition-all whitespace-nowrap"
             >
               Claude
+            </button>
+            <button
+              onClick={() => analyzeDOM(mistralRef, 'Mistral')}
+              className="px-2 py-0.5 text-xs bg-gray-800/30 text-gray-400 rounded hover:bg-gray-700/40 hover:text-gray-300 transition-all whitespace-nowrap"
+            >
+              Mistral
             </button>
           </div>
         </>

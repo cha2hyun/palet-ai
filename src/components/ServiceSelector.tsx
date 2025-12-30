@@ -7,7 +7,7 @@ interface ServiceSelectorProps {
   setEnabledServices: (services: EnabledServices) => void;
 }
 
-const MAX_SELECTIONS = 4;
+const MAX_SELECTIONS = 5;
 
 export default function ServiceSelector({ enabledServices, setEnabledServices }: ServiceSelectorProps) {
   // 현재 선택된 서비스 개수 계산
@@ -25,7 +25,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Chip>
 
       <Tooltip
-        content="Maximum 4 selections allowed"
+        content="Maximum 5 selections allowed"
         isDisabled={enabledServices.chatgpt || !isMaxReached}
         placement="top"
         showArrow
@@ -52,7 +52,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 4 selections allowed"
+        content="Maximum 5 selections allowed"
         isDisabled={enabledServices.gemini || !isMaxReached}
         placement="top"
         showArrow
@@ -79,7 +79,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 4 selections allowed"
+        content="Maximum 5 selections allowed"
         isDisabled={enabledServices.perplexity || !isMaxReached}
         placement="top"
         showArrow
@@ -106,7 +106,7 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 4 selections allowed"
+        content="Maximum 5 selections allowed"
         isDisabled={enabledServices.claude || !isMaxReached}
         placement="top"
         showArrow
@@ -133,7 +133,34 @@ export default function ServiceSelector({ enabledServices, setEnabledServices }:
       </Tooltip>
 
       <Tooltip
-        content="Maximum 4 selections allowed"
+        content="Maximum 5 selections allowed"
+        isDisabled={enabledServices.mistral || !isMaxReached}
+        placement="top"
+        showArrow
+        delay={0}
+        closeDelay={0}
+        classNames={{
+          content: 'bg-gray-800 text-white text-xs px-2 py-1 rounded'
+        }}
+      >
+        <div>
+          <Checkbox
+            isSelected={enabledServices.mistral}
+            onValueChange={(checked) => setEnabledServices({ ...enabledServices, mistral: checked })}
+            isDisabled={!enabledServices.mistral && isMaxReached}
+            size="sm"
+            classNames={{
+              wrapper: 'w-4 h-4',
+              label: 'text-sm font-medium text-gray-300'
+            }}
+          >
+            Mistral
+          </Checkbox>
+        </div>
+      </Tooltip>
+
+      <Tooltip
+        content="Maximum 5 selections allowed"
         isDisabled={enabledServices.browser || !isMaxReached}
         placement="top"
         showArrow

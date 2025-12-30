@@ -14,6 +14,7 @@ export interface WebviewRefs {
   geminiRef: React.RefObject<WebviewElement>;
   perplexityRef: React.RefObject<WebviewElement>;
   claudeRef: React.RefObject<WebviewElement>;
+  mistralRef: React.RefObject<WebviewElement>;
   browserRef: React.RefObject<WebviewElement>;
 }
 
@@ -22,6 +23,7 @@ export interface WebviewsReady {
   gemini: boolean;
   perplexity: boolean;
   claude: boolean;
+  mistral: boolean;
   browser: boolean;
 }
 
@@ -30,6 +32,7 @@ export function useWebviewManager() {
   const geminiRef = useRef<WebviewElement>(null);
   const perplexityRef = useRef<WebviewElement>(null);
   const claudeRef = useRef<WebviewElement>(null);
+  const mistralRef = useRef<WebviewElement>(null);
   const browserRef = useRef<WebviewElement>(null);
 
   const [webviewsReady, setWebviewsReady] = useState<WebviewsReady>({
@@ -37,6 +40,7 @@ export function useWebviewManager() {
     gemini: false,
     perplexity: false,
     claude: false,
+    mistral: false,
     browser: false
   });
 
@@ -53,15 +57,17 @@ export function useWebviewManager() {
       const geminiReady = geminiRef.current !== null;
       const perplexityReady = perplexityRef.current !== null;
       const claudeReady = claudeRef.current !== null;
+      const mistralReady = mistralRef.current !== null;
       const browserReady = browserRef.current !== null;
 
-      const allReady = chatgptReady && geminiReady && perplexityReady && claudeReady && browserReady;
+      const allReady = chatgptReady && geminiReady && perplexityReady && claudeReady && mistralReady && browserReady;
 
       setWebviewsReady({
         chatgpt: chatgptReady,
         gemini: geminiReady,
         perplexity: perplexityReady,
         claude: claudeReady,
+        mistral: mistralReady,
         browser: browserReady
       });
 
@@ -88,7 +94,7 @@ export function useWebviewManager() {
   }, []);
 
   return {
-    refs: { chatgptRef, geminiRef, perplexityRef, claudeRef, browserRef },
+    refs: { chatgptRef, geminiRef, perplexityRef, claudeRef, mistralRef, browserRef },
     webviewsReady
   };
 }

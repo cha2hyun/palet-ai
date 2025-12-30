@@ -61,7 +61,7 @@ function App() {
   // localStorage 연동 상태
   const [enabledServices, setEnabledServices] = useLocalStorage<EnabledServices>(
     'enabledServices',
-    { chatgpt: true, gemini: true, perplexity: true, claude: true, browser: false },
+    { chatgpt: true, gemini: true, perplexity: true, claude: true, mistral: true, browser: false },
     isValidEnabledServices
   );
 
@@ -74,14 +74,15 @@ function App() {
       chatgpt: AI_SERVICES.chatgpt.url,
       gemini: AI_SERVICES.gemini.url,
       perplexity: AI_SERVICES.perplexity.url,
-      claude: AI_SERVICES.claude.url
+      claude: AI_SERVICES.claude.url,
+      mistral: AI_SERVICES.mistral.url
     },
     isValidLastUrls
   );
 
   // Webview 관리
   const { refs, webviewsReady } = useWebviewManager();
-  const { chatgptRef, geminiRef, perplexityRef, claudeRef, browserRef } = refs;
+  const { chatgptRef, geminiRef, perplexityRef, claudeRef, mistralRef, browserRef } = refs;
 
   // AI 서비스 관리
   const { sendToAI, searchInBrowser } = useAIServices();
@@ -114,7 +115,8 @@ function App() {
       chatgpt: AI_SERVICES.chatgpt.url,
       gemini: AI_SERVICES.gemini.url,
       perplexity: AI_SERVICES.perplexity.url,
-      claude: AI_SERVICES.claude.url
+      claude: AI_SERVICES.claude.url,
+      mistral: AI_SERVICES.mistral.url
     };
 
     // localStorage 업데이트
@@ -137,7 +139,11 @@ function App() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (claudeRef.current as any).loadURL(AI_SERVICES.claude.url);
     }
-  }, [setLastUrls, chatgptRef, geminiRef, perplexityRef, claudeRef]);
+    if (mistralRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (mistralRef.current as any).loadURL(AI_SERVICES.mistral.url);
+    }
+  }, [setLastUrls, chatgptRef, geminiRef, perplexityRef, claudeRef, mistralRef]);
 
   // 모든 AI 서비스에 전송
   const handleSendToAll = useCallback(async () => {
@@ -191,6 +197,17 @@ function App() {
       );
     }
 
+    // Mistral에 전송
+    if (enabledServices.mistral && webviewsReady.mistral) {
+      await sendToAI(
+        mistralRef,
+        AI_SERVICES.mistral.selector,
+        AI_SERVICES.mistral.buttonSelector,
+        prompt,
+        AI_SERVICES.mistral.displayName
+      );
+    }
+
     // Browser에 전송
     if (enabledServices.browser && webviewsReady.browser) {
       await searchInBrowser(browserRef, prompt);
@@ -209,6 +226,7 @@ function App() {
     geminiRef,
     perplexityRef,
     claudeRef,
+    mistralRef,
     browserRef
   ]);
 
@@ -259,6 +277,15 @@ function App() {
           onUrlChange={handleUrlChange}
         />
 
+        {/* Mistral */}
+        <WebviewPanel
+          service={AI_SERVICES.mistral}
+          webviewRef={mistralRef as unknown as React.RefObject<HTMLElement>}
+          isVisible={enabledServices.mistral}
+          lastUrl={lastUrls.mistral}
+          onUrlChange={handleUrlChange}
+        />
+
         {/* Web Browser */}
         <BrowserPanel
           browserRef={browserRef as unknown as React.RefObject<HTMLElement>}
@@ -294,6 +321,7 @@ function App() {
                 geminiRef={geminiRef}
                 perplexityRef={perplexityRef}
                 claudeRef={claudeRef}
+                mistralRef={mistralRef}
               />
             )}
 
