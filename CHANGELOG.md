@@ -2,7 +2,7 @@
 
 All notable changes to Palet AI will be documented in this file.
 
-## [1.0.8] - 2024-12-30
+## [1.0.8] - 2025-12-30
 
 ### ⚙️ Developer Experience
 
@@ -25,7 +25,7 @@ All notable changes to Palet AI will be documented in this file.
 
 ---
 
-## [1.0.7] - 2024-12-30
+## [1.0.7] - 2025-12-30
 
 ### ✨ Features
 
